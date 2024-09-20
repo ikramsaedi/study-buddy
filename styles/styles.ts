@@ -3,6 +3,8 @@ import { StyleSheet } from "react-native";
 export const textColor = "#1D192B";
 export const backgroundColor = "#E0C7E9";
 export const navbarBackgroundColor = "#F3EDF7";
+export const accentColor = "#D74A76";
+
 export const baseUnit = 8;
 
 export const styles = StyleSheet.create({
