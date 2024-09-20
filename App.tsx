@@ -10,6 +10,8 @@ import {
 } from "./styles/styles";
 import { Profile } from "./pages/Profile";
 import { Tracker } from "./pages/Tracker";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 const Tab = createBottomTabNavigator();
 
@@ -33,9 +35,41 @@ export default function App() {
           headerTitle: "Study Buddy",
         }}
       >
-        <Tab.Screen name="Tracker" component={Tracker} />
-        <Tab.Screen name="Leaderboard" component={Leaderboard} />
-        <Tab.Screen name="Profile" component={Profile} />
+        <Tab.Screen
+          name="Tracker"
+          component={Tracker}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="clock-outline"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Leaderboard"
+          component={Leaderboard}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="leaderboard" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={Profile}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="account"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
       </Tab.Navigator>
     </NavigationContainer>
   );
