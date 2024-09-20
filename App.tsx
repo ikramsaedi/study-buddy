@@ -62,11 +62,7 @@ export default function App() {
           component={Profile}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons
-                name="account"
-                color={color}
-                size={size}
-              />
+              <MaterialIcons name="person-outline" color={color} size={size} />
             ),
           }}
         />
