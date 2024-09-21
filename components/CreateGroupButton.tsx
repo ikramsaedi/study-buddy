@@ -2,6 +2,7 @@ import React from "react";
 import { TouchableOpacity, Alert } from "react-native";
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { ROOT_URL } from "../config";
 import { baseIconSize, accentColor, doubleBaseUnit } from "../styles/styles";
 
 const CreateGroupButton = () => {
@@ -14,7 +15,7 @@ const CreateGroupButton = () => {
 
       const response = await axios.get(
         // we will need to change the ip, but for now it is running on cham's machine
-        "http://192.168.169.2:3000/api/courses"
+        `${ROOT_URL}/api/courses`
       );
 
       const matchedUser = response.data.match;

@@ -10,7 +10,6 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import CreateGroupButton from "./components/CreateGroupButton";
 
-
 import {
   accentColor,
   backgroundColor,

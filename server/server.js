@@ -3,7 +3,7 @@ const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Enable CORS for cross-origin requests
 app.use(cors());
@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json()); // Add this line
 
 // Connect to SQLite Database
-const db = new sqlite3.Database("../database/studybuddy.db", (err) => {
+const db = new sqlite3.Database("./studybuddy.db", (err) => {
   if (err) {
     console.error("Error opening database:", err.message);
   } else {
@@ -165,7 +165,7 @@ app.get("/api/match", (req, res) => {
       );
     }
   );
-
+})
 // API endpoint to add a study session
 app.post("/api/addStudySession", (req, res) => {
   console.log("Received request body:", req.body); // Log the request body
