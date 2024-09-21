@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { bodyFontSize, doubleBaseUnit, baseUnit, LargeNumberText, smallerTitleFontSize, smallFontSize } from '../styles/styles';
+import axios from 'axios';
 
 export function StatCard() {
   const [userStats, setUserStats] = useState({
@@ -17,10 +18,9 @@ export function StatCard() {
     const userId = 1; // Replace this with the actual logged-in user ID
 
     // We have to replace this url with your IP Address
-    fetch(`http://192.168.211.174:3000/api/user/${userId}/stats`)
-      .then(response => response.json())
-      .then(data => {
-        setUserStats(data);
+    axios.get(`http://192.168.211.174:3000/api/user/${userId}/stats`)
+      .then(response => {
+        setUserStats(response.data);
       })
       .catch(error => {
         console.error('Error fetching user stats:', error);
