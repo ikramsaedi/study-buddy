@@ -1,43 +1,36 @@
 import React, { useState, useRef } from "react";
-import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { View, Text, StyleSheet } from "react-native";
+import { StopwatchButtons } from "../components/StopwatchButtons";
 
 export const Tracker = () => {
   // State and refs to manage time and stopwatch status
   const [time, setTime] = useState(0);
   const [running, setRunning] = useState(false);
-  const intervalRef = useRef(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef(0);
 
   // Function to start the stopwatch
   const startStopwatch = () => {
     startTimeRef.current = Date.now() - time * 1000;
+
     intervalRef.current = setInterval(() => {
       setTime(Math.floor((Date.now() - startTimeRef.current) / 1000));
     }, 1000);
+
     setRunning(true);
   };
 
   // Function to pause the stopwatch
   const pauseStopwatch = () => {
-    clearInterval(intervalRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setRunning(false);
   };
 
   // Function to reset the stopwatch
   const resetStopwatch = () => {
-    clearInterval(intervalRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
     setTime(0);
     setRunning(false);
-  };
-
-  // Function to resume the stopwatch
-  const resumeStopwatch = () => {
-    startTimeRef.current = Date.now() - time * 1000;
-    intervalRef.current = setInterval(() => {
-      setTime(Math.floor((Date.now() - startTimeRef.current) / 1000));
-    }, 1000);
-    setRunning(true);
   };
 
   // Function to format the time as hh:mm:ss
@@ -63,69 +56,12 @@ export const Tracker = () => {
         </View>
 
         {/* Play/Pause/Reset Button */}
-        <View style={styles.buttonContainer}>
-          {running ? (
-            <>
-              {/* stop stopwatch */}
-              <TouchableOpacity
-                style={styles.playButtonContainer}
-                onPress={() => {
-                  // pauses stopwatch
-                  pauseStopwatch();
-
-                  // fires alert
-                  Alert.alert(
-                    "Add Hours", // title
-                    "Would you like to add the tracked hours to your total study time?", // message
-                    [
-                      {
-                        text: "No",
-                        onPress: () => resetStopwatch(),
-                        style: "cancel",
-                      },
-                      {
-                        text: "Yes",
-                        onPress: () => resetStopwatch(),
-                      },
-                    ],
-                    { cancelable: true }
-                  );
-                }}
-              >
-                <MaterialCommunityIcons
-                  name="stop"
-                  color={"#D74A76"}
-                  size={50}
-                />
-              </TouchableOpacity>
-              {/* pause stopwatch */}
-              <TouchableOpacity
-                style={styles.playButtonContainer}
-                onPress={pauseStopwatch}
-              >
-                <MaterialCommunityIcons
-                  name="pause"
-                  color={"#D74A76"}
-                  size={50}
-                />
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              {/* starts stopwatch  */}
-              <TouchableOpacity
-                style={styles.playButtonContainer}
-                onPress={startStopwatch}
-              >
-                <MaterialCommunityIcons
-                  name="play"
-                  color={"#D74A76"}
-                  size={50}
-                />
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
+        <StopwatchButtons
+          running={running}
+          startStopwatch={startStopwatch}
+          pauseStopwatch={pauseStopwatch}
+          resetStopwatch={resetStopwatch}
+        />
       </View>
     </>
   );
@@ -168,29 +104,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#555",
-  },
-  playButtonContainer: {
-    marginTop: 30,
-    margin: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    width: 80,
-    height: 80,
-    borderRadius: 100,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 3 },
-  },
-  playButton: {
-    width: 30,
-    height: 30,
-    backgroundColor: "#E74C3C", // Red for the play button
-    borderRadius: 5,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginTop: 20,
   },
 });
