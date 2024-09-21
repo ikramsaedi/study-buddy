@@ -32,3 +32,30 @@ app.get("/api/courses", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+app.get("/api/user/:id/stats", (req, res) => {
+  const userId = req.params.id;
+
+  const query = `
+    SELECT
+      SUM(durationMinutes) as totalMinutes,
+      MAX(durationMinutes) as longestSession,
+      COUNT(*) as sessions,
+      COUNT(DISTINCT tag) as types
+    FROM studySession
+    WHERE userId = ?
+  `;
+
+  db.get(query, [userId], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      totalMinutes: row.totalMinutes || 0,
+      longestSession: row.longestSession || 0,
+      sessions: row.sessions || 0,
+      types: row.types || 0
+    });
+  });
+});
