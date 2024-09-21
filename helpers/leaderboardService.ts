@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ROOT_URL } from '../config';
+import LocalState from '../LocalState';
 
 // Fetch members for a specific group
 export const fetchGroupMembers = async (groupId: number) => {
@@ -17,8 +18,9 @@ export const fetchGroupMembers = async (groupId: number) => {
 
 // Fetch study groups from the API
 export const fetchStudyGroups = async () => {
+  const localState = LocalState.getInstance();
   try {
-    const response = await axios.get(`${ROOT_URL}/api/user/1/studyGroups`); // Change userId as needed
+    const response = await axios.get(`${ROOT_URL}/api/user/${localState.getUserDataId()}/studyGroups`); // Change userId as needed
     return response.data.studyGroups.reduce((acc: { [key: number]: string }, group: { id: number, name: string }) => {
       acc[group.id] = group.name;
       return acc;
