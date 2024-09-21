@@ -154,6 +154,33 @@ app.get("/api/match", (req, res) => {
   );
 });
 
+// API route to if user is already in a matched group
+app.get("/api/isUserInMatchedGroup", (req, res) => {
+  const { userId } = req.query;
+
+  // Step 1: Check if the user is already in an auto-match group
+  db.get(
+    `SELECT * FROM user_studyGroup usg
+     JOIN studyGroup sg ON usg.studyGroupId = sg.id
+     WHERE usg.userId = ? AND sg.isAutomatch = 1`,
+    [userId],
+    (err, row) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+
+      // If row exists, user is already in an auto-match group
+      if (row) {
+        res.json({ isInMatchedGroup: true });
+      } else {
+        res.json({ isInMatchedGroup: false });
+      }
+    }
+  );
+});
+
+
 // API endpoint to add a study session
 app.post("/api/addStudySession", (req, res) => {
   console.log("Received request body:", req.body); // Log the request body
