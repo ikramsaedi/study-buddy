@@ -21,7 +21,9 @@ export function Leaderboard() {
       </View>
 
       {/* Find Buddy Button */}
-      <FindBuddyButton onMatchFound={handleMatchFound} />
+      <View style={{ padding: doubleBaseUnit }}>
+        <FindBuddyButton onMatchFound={handleMatchFound} />
+      </View>
 
       {/* Leaderboard List */}
       <LeaderboardList />

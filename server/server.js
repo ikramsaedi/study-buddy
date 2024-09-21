@@ -20,18 +20,6 @@ const db = new sqlite3.Database("./studybuddy.db", (err) => {
   }
 });
 
-// API endpoint to get all courses
-app.get("/api/courses", (req, res) => {
-  db.all("SELECT * FROM course", [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ courses: rows });
-  });
-});
-
-
 // API route to find a matching user
 app.get("/api/match", (req, res) => {
   const { userId } = req.query;
@@ -165,7 +153,8 @@ app.get("/api/match", (req, res) => {
       );
     }
   );
-})
+});
+
 // API endpoint to add a study session
 app.post("/api/addStudySession", (req, res) => {
   console.log("Received request body:", req.body); // Log the request body
@@ -173,9 +162,23 @@ app.post("/api/addStudySession", (req, res) => {
   const { userId, start, end, durationMinutes, tag } = req.body;
 
   // Validate the input
-  if (!userId || !start || !end || (typeof durationMinutes !== "number" && !durationMinutes) || !tag) {
-    console.log("loaf are we in here?", {userId, start, end, durationMinutes, tag})
-    return res.status(400).json({ error: "Invalid request or unauthorized user" });
+  if (
+    !userId ||
+    !start ||
+    !end ||
+    (typeof durationMinutes !== "number" && !durationMinutes) ||
+    !tag
+  ) {
+    console.log("loaf are we in here?", {
+      userId,
+      start,
+      end,
+      durationMinutes,
+      tag,
+    });
+    return res
+      .status(400)
+      .json({ error: "Invalid request or unauthorized user" });
   }
 
   // SQL query to insert a new study session
@@ -190,7 +193,6 @@ app.post("/api/addStudySession", (req, res) => {
     }
     res.json({ message: "Study session added successfully!" });
   });
-
 });
 
 // Start server
