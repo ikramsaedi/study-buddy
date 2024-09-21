@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import {
   doubleBaseUnit,
@@ -24,8 +25,10 @@ import {
 import { StatCard } from "../components/StatCard";
 import axios from "axios";
 import { ROOT_URL } from "../config";
+import LocalState from "../LocalState";
 
 export const Profile = () => {
+  const localState = LocalState.getInstance();
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -33,7 +36,7 @@ export const Profile = () => {
     const fetchProfileData = async () => {
       try {
         const response = await axios.get(`${ROOT_URL}/api/profile`, {
-          params: { userId: 1 }, // Replace with dynamic userId if needed
+          params: { userId: localState.getUserDataId() }, // Replace with dynamic userId if needed
         });
         setProfileData(response.data.user);
       } catch (error) {
@@ -73,8 +76,8 @@ export const Profile = () => {
             style={styles.profileImage}
           />
         </View>
-        <Text style={styles.profileName}>Cham Gamage</Text>
-        <TouchableOpacity style={styles.editButton}>
+        <Text style={styles.profileName}>{profileData.name}</Text>
+        <TouchableOpacity style={styles.editButton}  onPress={() => Alert.alert("Not Implemented", "This feature is not part of the MVP.")}>
           <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
         <View style={styles.statsContainer}>

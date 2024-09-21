@@ -24,134 +24,79 @@ const db = new sqlite3.Database("./studybuddy.db", (err) => {
 app.get("/api/match", (req, res) => {
   const { userId } = req.query;
 
-  // Step 1: Query the user's degree and goalMinutes based on userId
-  db.get(
-    `SELECT degree, goalMinutes
-     FROM user
-     WHERE id = ?`,
-    [userId],
-    (err, user) => {
+  getUserById(userId, (err, user) => {
+    if (err) {
+      if (err.message === "User not found") {
+        return res.status(404).json({ message: "User not found" });
+      }
+      return res.status(500).json({ error: err.message });
+    }
+
+    const { degree, goalMinutes } = user;
+
+    // Step 2: Check if the user is already in an active auto-match group
+    isUserInActiveAutoMatchGroup(userId, (err, isInGroup) => {
       if (err) {
-        console.log("first");
-        res.status(500).json({ error: err.message });
-        return;
+        return res.status(500).json({ error: err.message });
       }
 
-      if (!user) {
-        res.json({ message: "User not found" });
-        return;
+      if (isInGroup) {
+        return res.json({
+          message: "User is already in an active auto-match group",
+        });
       }
 
-      const { degree, goalMinutes } = user;
+      // Step 3: Find a match based on degree and goalMinutes
+      findMatchingUser(userId, degree, goalMinutes, (err, matchedUser) => {
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
 
-      console.log("userId:", userId);
-      console.log("degree:", degree);
-      console.log("goalMinutes:", goalMinutes);
+        if (matchedUser) {
+          // Step 4: Create a new group
+          createStudyGroup(true, (err, newGroupId) => {
+            if (err) {
+              return res.status(500).json({ error: err.message });
+            }
 
-      // Step 2: Check if the user is already in an auto-match group
-      db.get(
-        `SELECT * FROM user_studyGroup usg
-         JOIN studyGroup sg ON usg.studyGroupId = sg.id
-         WHERE usg.userId = ? AND sg.isAutomatch = 1`,
-        [userId],
-        (err, row) => {
-          if (err) {
-            console.log("second");
-            res.status(500).json({ error: err.message });
-            return;
-          }
-
-          if (row) {
-            res.json({ message: "User is already in an auto-match group" });
-          } else {
-            // Step 3: Find a match based on degree and goalMinutes
-            db.get(
-              `WITH DegreeMatches AS (
-                SELECT *, ABS(goalMinutes - ?) AS goalDiff FROM user
-                WHERE degree = ?
-                AND id NOT IN (
-                    SELECT userId FROM user_studyGroup
-                    WHERE studyGroupId IN (
-                    SELECT id FROM studyGroup 
-                    WHERE isAutomatch = true
-                    AND DATETIME('now') > start
-                    AND DATETIME('now') < end
-                    )
-                )
-                AND id != ?  -- Exclude the requesting user
-                ORDER BY goalDiff ASC
-                )
-                SELECT * FROM DegreeMatches
-                UNION ALL
-                SELECT *, ABS(goalMinutes - ?) AS goalDiff FROM user
-                WHERE id NOT IN (
-                SELECT userId FROM user_studyGroup
-                WHERE studyGroupId IN (
-                    SELECT id FROM studyGroup 
-                    WHERE isAutomatch = true
-                    AND DATETIME('now') > start
-                    AND DATETIME('now') < end
-                )
-                )
-                AND id != ?  -- Exclude the requesting user
-                ORDER BY goalDiff ASC
-                LIMIT 1;`,
-              [goalMinutes, degree, userId, goalMinutes, userId],
-              (err, matchedUser) => {
+            // Step 5: Add users to the study group
+            addUsersToStudyGroup(
+              [userId, matchedUser.id],
+              newGroupId,
+              (err) => {
                 if (err) {
-                  console.log("third");
-                  res.status(500).json({ error: err.message });
-                  return;
+                  return res.status(500).json({ error: err.message });
                 }
 
-                if (matchedUser) {
-                  const now = new Date().toISOString(); // Get the current date and time in ISO format
-                  const oneWeekFromNow = new Date();
-                  oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7); // Add one week
-                  const end = oneWeekFromNow.toISOString(); // Get the date one week from now in ISO format
-
-                  db.run(
-                    `INSERT INTO studyGroup (name, isAutomatch, start, end) VALUES ('Study Buddy Group', ?, ?, ?)`,
-                    [1, now, end],
-                    function (err) {
-                      if (err) {
-                        console.log("forth", err.message);
-                        res.status(500).json({ error: err.message });
-                        return;
-                      }
-
-                      const newGroupId = this.lastID; // Get the new group's ID
-
-                      // Step 5: Add users to user_group table
-                      db.run(
-                        `INSERT INTO user_studyGroup (userId, studyGroupId) VALUES (?, ?), (?, ?)`,
-                        [userId, newGroupId, matchedUser.id, newGroupId],
-                        (err) => {
-                          if (err) {
-                            console.log("fifth", err.message);
-                            res.status(500).json({ error: err.message });
-                            return;
-                          }
-
-                          res.json({
-                            message: "New group created and users added",
-                            groupId: newGroupId,
-                            matchedUser,
-                          });
-                        }
-                      );
-                    }
-                  );
-                } else {
-                  res.json({ message: "No match found" });
-                }
+                res.json({
+                  message: "New group created and users added",
+                  groupId: newGroupId,
+                  matchedUser,
+                });
               }
             );
-          }
+          });
+        } else {
+          res.json({ message: "No match found" });
         }
-      );
+      });
+    });
+  });
+});
+
+// API route to check if user is already in a matched group and if the group is active
+// Update /api/isUserInMatchedGroup to use the helper function
+app.get("/api/isUserInMatchedGroup", (req, res) => {
+  const { userId } = req.query;
+
+  isUserInActiveAutoMatchGroup(userId, (err, isInGroup) => {
+    if (err) {
+      console.log("Error fetching user group:", err.message);
+      return res.status(500).json({ error: err.message });
     }
-  );
+
+    res.json({ isInMatchedGroup: isInGroup });
+  });
 });
 
 // API endpoint to add a study session
@@ -282,32 +227,146 @@ app.get("/api/groups/:id/members", (req, res) => {
 });
 
 // Endpoint to get user profile information
+// Endpoint to get user profile information
 app.get("/api/profile", (req, res) => {
   const { userId } = req.query;
 
-  // Query the user information from the database
-  db.get(
-    `SELECT name, gender, degree, pronouns, goalMinutes
-     FROM user
-     WHERE id = ?`,
-    [userId],
-    (err, user) => {
-      if (err) {
-        console.log("Error getting user profile:", err.message);
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      if (!user) {
-        console.log("User not found");
+  getUserById(userId, (err, user) => {
+    if (err) {
+      console.log("Error getting user profile:", err.message);
+      if (err.message === "User not found") {
         res.status(404).json({ message: "User not found" });
-        return;
+      } else {
+        res.status(500).json({ error: err.message });
       }
-      res.json({ user });
+      return;
     }
-  );
+    res.json({ user });
+  });
 });
 
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+function getUserById(userId, callback) {
+  db.get(
+    `SELECT id, name, gender, degree, pronouns, goalMinutes
+     FROM user
+     WHERE id = ?`,
+    [userId],
+    (err, user) => {
+      if (err) {
+        return callback(err);
+      }
+      if (!user) {
+        return callback(new Error("User not found"));
+      }
+      callback(null, user);
+    }
+  );
+}
+
+function isUserInActiveAutoMatchGroup(userId, callback) {
+  // Log the userId for debugging purposes
+  console.log("Checking for userId:", userId);
+
+  // Query to check if the user is in an active auto-match group using DATETIME('now')
+  db.get(
+    `SELECT * FROM user_studyGroup usg
+     JOIN studyGroup sg ON usg.studyGroupId = sg.id
+     WHERE usg.userId = ?
+     AND sg.isAutomatch = 1 
+     AND DATETIME('now') BETWEEN DATETIME(sg.start) AND DATETIME(sg.end)`,
+    [userId],
+    (err, row) => {
+      if (err) {
+        console.log("Error fetching user group:", err.message);
+        return callback(err);
+      }
+
+      console.log("Query result:", row); // Log the query result for debugging
+
+      // If row exists, user is already in an active auto-match group
+      callback(null, !!row);
+    }
+  );
+}
+
+function findMatchingUser(userId, degree, goalMinutes, callback) {
+  db.get(
+    `WITH DegreeMatches AS (
+      SELECT *, ABS(goalMinutes - ?) AS goalDiff FROM user
+      WHERE degree = ?
+        AND id NOT IN (
+          SELECT userId FROM user_studyGroup
+          WHERE studyGroupId IN (
+            SELECT id FROM studyGroup
+            WHERE isAutomatch = 1
+              AND DATETIME('now') BETWEEN start AND end
+          )
+        )
+        AND id != ?
+      ORDER BY goalDiff ASC
+    )
+    SELECT * FROM DegreeMatches
+    UNION ALL
+    SELECT *, ABS(goalMinutes - ?) AS goalDiff FROM user
+    WHERE id NOT IN (
+      SELECT userId FROM user_studyGroup
+      WHERE studyGroupId IN (
+        SELECT id FROM studyGroup
+        WHERE isAutomatch = 1
+          AND DATETIME('now') BETWEEN start AND end
+      )
+    )
+      AND id != ?
+    ORDER BY goalDiff ASC
+    LIMIT 1;`,
+    [goalMinutes, degree, userId, goalMinutes, userId],
+    (err, matchedUser) => {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, matchedUser);
+    }
+  );
+}
+
+function createStudyGroup(isAutomatch, callback) {
+  const now = new Date().toISOString(); // Current datetime in ISO format
+  const oneWeekFromNow = new Date();
+  oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7); // Add one week
+  const end = oneWeekFromNow.toISOString();
+
+  db.run(
+    `INSERT INTO studyGroup (name, isAutomatch, start, end) VALUES ('Study Buddy Group', ?, ?, ?)`,
+    [isAutomatch ? 1 : 0, now, end],
+    function (err) {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, this.lastID); // Return the new group's ID
+    }
+  );
+}
+
+function addUsersToStudyGroup(userIds, studyGroupId, callback) {
+  const placeholders = userIds.map(() => "(?, ?)").join(", ");
+  const values = [];
+  userIds.forEach((userId) => {
+    values.push(userId, studyGroupId);
+  });
+
+  db.run(
+    `INSERT INTO user_studyGroup (userId, studyGroupId) VALUES ${placeholders}`,
+    values,
+    function (err) {
+      if (err) {
+        return callback(err);
+      }
+      callback(null);
+    }
+  );
+}
