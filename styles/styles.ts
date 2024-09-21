@@ -22,47 +22,88 @@ export const styles = StyleSheet.create({
   },
   timer_container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#EADCF3', // Light lavender background
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  header: {
-    fontSize: 30,
-    color: "green",
-    marginBottom: 10,
+  trackerBackground: {
+    width: 350,
+    height: 350,
+    borderRadius: 350, // To make it circular
+    borderWidth: 30,
+    borderColor: '#F3EDF7', 
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3EDF7',
   },
-  subHeader: {
-    fontSize: 18,
-    marginBottom: 10,
-    color: "blue",
+  trackerContainer: {
+    width: 325,
+    height: 325,
+    borderRadius: 325, // To make it circular
+    borderWidth: 30,
+    borderColor: '#C0A9E6', // Purple border color
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F5F1FB', // Inner white circle background
   },
   timeText: {
-    fontSize: 48,
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#333',
   },
-  buttonContainer: {
-    flexDirection: "row",
-    marginTop: 20,
+  startText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: 20,
   },
-  button: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+  playButtonContainer: {
+    marginTop: 30,
+    margin: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    width: 100,
+    height: 100,
+    borderRadius: 100,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  playButton: {
+    width: 30,
+    height: 30,
+    backgroundColor: '#E74C3C', // Red for the play button
     borderRadius: 5,
   },
-  startButton: {
-    backgroundColor: "#2ecc71",
-    marginRight: 10,
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    position: 'absolute',
+    bottom: 10,
+    paddingHorizontal: 40,
   },
-  resetButton: {
-    backgroundColor: "#e74c3c",
-    marginRight: 10,
+  navButton: {
+    alignItems: 'center',
   },
-  pauseButton: {
-    backgroundColor: "#f39c12",
+  navIcon: {
+    width: 25,
+    height: 25,
   },
-  resumeButton: {
-    backgroundColor: "#3498db",
+  navText: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 5,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
   },
   buttonText: {
-    color: "white",
     fontSize: 16,
+    color: '#555', // Grey text color for buttons
   },
 });
