@@ -10,9 +10,11 @@ We believe that StudyBuddy can help build strong connections among students, ult
 
 ## Android app
 
-You can download the APK for this app on android at the following link:
+You can download the APK for this app on android at the following link: https://expo.dev/accounts/ikramsaedi/projects/study-buddy/builds/76550001-71fe-4cfe-a966-7da3303e16ee
 
 Note: You may need to change some security settings on your phone to enable this. See: https://www.lifewire.com/install-apk-on-android-4177185 for more troubleshooting details.
+
+If you struggle to set this up, see [Web](#web)
 
 ## Apple
 
