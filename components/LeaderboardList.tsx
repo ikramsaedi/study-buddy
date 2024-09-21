@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import { MoreMenu } from './MoreMenu';  // Import the modified MoreMenu component
+import { MoreMenu } from './MoreMenu';
 import { accentColor, baseIconSize, baseUnit, bodyFontSize, doubleBaseUnit } from '../styles/styles';
 
 type Member = {
@@ -45,23 +45,25 @@ export function LeaderboardList() {
   const handleCreateGroup = (groupName: string) => {
     setGroupMembersData((prevState) => ({
       ...prevState,
-      [groupName]: [{ name: 'You', hours: 0 }]  // Add the user as the first member of the new group
+      [groupName]: [{ name: 'You', hours: 0 }]
     }));
-    setSelectedTab(groupName);  // Automatically select the new group
-    setMembers([{ name: 'You', hours: 0 }]);  // Set the members for the new group
+    setSelectedTab(groupName);
+    setMembers([{ name: 'You', hours: 0 }]);
   };
 
   return (
     <>
-      {/* Group tabs */}
-      <View style={styles.tabsContainer}>
-        {Object.keys(groupMembersData).map(group => (
-          <TouchableOpacity key={group} onPress={() => handleGroupSelect(group)} style={selectedTab === group ? [styles.tab, styles.selectedTab] : styles.tab}>
-            <Text style={selectedTab === group ? [styles.tabText, styles.selectedTabText] : styles.tabText}>{group}</Text>
-          </TouchableOpacity>
-        ))}
+      <View style={styles.tabsWrapper}>
+        {/* Group tabs in a scrollable view */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsContainer}>
+          {Object.keys(groupMembersData).map(group => (
+            <TouchableOpacity key={group} onPress={() => handleGroupSelect(group)} style={selectedTab === group ? [styles.tab, styles.selectedTab] : styles.tab}>
+              <Text style={selectedTab === group ? [styles.tabText, styles.selectedTabText] : styles.tabText}>{group}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
-        {/* More Icon Button */}
+        {/* More Icon Button, fixed to stay visible */}
         <TouchableOpacity onPress={() => setShowMoreMenu(true)} style={styles.moreButton}>
           <Feather name="more-vertical" size={baseIconSize} color={accentColor} />
         </TouchableOpacity>
@@ -92,12 +94,15 @@ export function LeaderboardList() {
 }
 
 const styles = StyleSheet.create({
-  tabsContainer: {
+  tabsWrapper: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderColor: '#D3D3D3',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    flexGrow: 1,
   },
   tab: {
     paddingVertical: doubleBaseUnit,
@@ -117,8 +122,8 @@ const styles = StyleSheet.create({
     color: accentColor,
   },
   moreButton: {
-    justifyContent: 'center',
     paddingHorizontal: doubleBaseUnit,
+    justifyContent: 'center',
   },
   leaderboardContainer: {
     padding: baseUnit,
