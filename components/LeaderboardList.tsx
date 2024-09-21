@@ -83,7 +83,14 @@ export function LeaderboardList() {
       setMembers(sortedMembers);
     };
 
+    // Initial fetch when component mounts
     loadGroups();
+
+    // Set an interval to fetch stats every 5 seconds
+    const intervalId = setInterval(loadGroups, 5000);
+
+    // Cleanup the interval when component unmounts
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleGroupSelect = (group: string) => {

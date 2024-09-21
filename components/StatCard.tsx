@@ -32,7 +32,6 @@ export function StatCard() {
 
     // Function to fetch stats
     const fetchStats = () => {
-      console.log("loaf fetching stats...");
       axios
         .get(`${ROOT_URL}/api/user/${userId}/stats`)
         .then((response) => {
@@ -46,7 +45,7 @@ export function StatCard() {
     // Initial fetch when component mounts
     fetchStats();
 
-    // Set an interval to fetch stats every 5 seconds (60000 milliseconds)
+    // Set an interval to fetch stats every 5 seconds
     const intervalId = setInterval(fetchStats, 5000);
 
     // Cleanup the interval when component unmounts
