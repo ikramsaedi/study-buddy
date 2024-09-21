@@ -8,6 +8,7 @@ import { Profile } from "./pages/Profile";
 import { Tracker } from "./pages/Tracker";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import CreateGroupButton from "./components/CreateGroupButton";
 
 import {
   accentColor,
@@ -55,16 +56,8 @@ export default function App() {
                   color={accentColor}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => alert("Add a new person")}
-                style={{ marginRight: doubleBaseUnit }}
-              >
-                <MaterialIcons
-                  name="person-add-alt"
-                  size={baseIconSize}
-                  color={accentColor}
-                />
-              </TouchableOpacity>
+              {/* Pass the db instance to CreateGroupButton */}
+              <CreateGroupButton db={db} />
             </View>
           ),
         }}
