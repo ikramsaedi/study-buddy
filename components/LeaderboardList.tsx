@@ -64,7 +64,7 @@ export function LeaderboardList() {
   };
 
   useEffect(() => {
-    const loadGroups = async () => {
+    const firstLoadGroups = async () => {
       const groupData = await fetchStudyGroups();
       setGroups(groupData);
 
@@ -83,8 +83,13 @@ export function LeaderboardList() {
       setMembers(sortedMembers);
     };
 
+    const loadGroups = async () => {
+      const groupData = await fetchStudyGroups();
+      setGroups(groupData);
+    };
+
     // Initial fetch when component mounts
-    loadGroups();
+    firstLoadGroups();
 
     // Set an interval to fetch stats every 5 seconds
     const intervalId = setInterval(loadGroups, 2000);
