@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import * as SQLite from "expo-sqlite";
 import { Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { Leaderboard } from "./pages/Leaderboard";
@@ -16,6 +17,13 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  useEffect(() => {
+    const openDB = async () => {
+      const db = SQLite.openDatabaseSync("studybuddy.db");
+      // You can add more logic to use the db here if necessary
+    };
+    openDB();
+  }, []);
   return (
     <NavigationContainer>
       <Tab.Navigator
