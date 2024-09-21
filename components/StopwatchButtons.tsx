@@ -1,11 +1,5 @@
-import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  Platform,
-} from "react-native";
+import React from "react";
+import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import axios from "axios";
 import { ROOT_URL } from "../config";
@@ -14,46 +8,18 @@ import LocalState from "../LocalState";
 type StopwatchButtonsProps = {
   running: boolean;
   pauseStopwatch: () => void;
-  resetStopwatch: () => void;
-  startStopwatch: () => void;
+  handleStop: () => void;
+  handleStart: () => void;
   time: number; // time in seconds
-};
-
-// Function to convert seconds to minutes
-const calculateDurationMinutes = (timeInSeconds: number): number => {
-  return Math.round(timeInSeconds / 60); // Convert to minutes and round off
-};
-
-// Function to send study session data to the backend
-const addStudySession = async (
-  durationMinutes: number,
-  startTime: Date,
-  endTime: Date
-) => {
-  const localState = LocalState.getInstance();
-
-  try {
-    await axios.post(`${ROOT_URL}/api/addStudySession`, {
-      userId: localState.getUserDataId(),
-      durationMinutes: durationMinutes,
-      start: startTime.toISOString(), // Send as ISO string
-      end: endTime.toISOString(), // Send as ISO string
-      tag: "focus", // Fixed tag as 'focus'
-    });
-    Alert.alert("Study session added successfully!");
-  } catch (error) {
-    console.error("Error adding study session:", error);
-    Alert.alert("Error adding study session.");
-  }
 };
 
 export function StopwatchButtons({
   running,
   pauseStopwatch,
-  resetStopwatch,
-  startStopwatch,
-  time, // Time is passed from parent in seconds
+  handleStop,
+  handleStart,
 }: StopwatchButtonsProps) {
+
   const [startTime, setStartTime] = useState<Date | null>(null); // Track start time
   const [endTime, setEndTime] = useState<Date | null>(null); // Track end time
 
