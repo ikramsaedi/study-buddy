@@ -19,6 +19,72 @@ export function StopwatchButtons({
   handleStop,
   handleStart,
 }: StopwatchButtonsProps) {
+
+  const [startTime, setStartTime] = useState<Date | null>(null); // Track start time
+  const [endTime, setEndTime] = useState<Date | null>(null); // Track end time
+
+  const handleStart = () => {
+    setStartTime(new Date()); // Capture start time
+    startStopwatch();
+  };
+
+  const handleStop = () => {
+    const stopTime = new Date(); // Capture end time
+    setEndTime(stopTime);
+
+    pauseStopwatch();
+    const durationMinutes = calculateDurationMinutes(time); // Calculate duration in minutes
+
+    // Need this for the browser for apple devices
+    const alertPolyfill = (
+      title: string,
+      description: string,
+      options: any
+    ) => {
+      const result = window.confirm(
+        [title, description].filter(Boolean).join("\n\n")
+      );
+
+      if (result) {
+        const confirmOption = options.find(
+          (option: any) => option.style !== "cancel"
+        );
+        confirmOption && confirmOption.onPress();
+      } else {
+        const cancelOption = options.find(
+          (option: any) => option.style === "cancel"
+        );
+        cancelOption && cancelOption.onPress();
+      }
+    };
+
+    // Fire the alert asking whether to add the study session
+    const alert = Platform.OS === "web" ? alertPolyfill : Alert.alert;
+
+    alert(
+      "Add Hours", // title
+      "Would you like to add the tracked hours to your total study time?", // message
+      [
+        {
+          text: "No",
+          onPress: () => resetStopwatch(),
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            if (startTime) {
+              // Add study session to the backend
+              addStudySession(durationMinutes, startTime, stopTime);
+            }
+            resetStopwatch(); // Reset the stopwatch
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <View style={styles.buttonContainer}>
       {running ? (
