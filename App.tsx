@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { Leaderboard } from "./pages/Leaderboard";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -7,6 +7,8 @@ import {
   accentColor,
   backgroundColor,
   navbarBackgroundColor,
+  baseIconSize,
+  doubleBaseUnit
 } from "./styles/styles";
 import { Profile } from "./pages/Profile";
 import { Tracker } from "./pages/Tracker";
@@ -32,7 +34,18 @@ export default function App() {
             backgroundColor: navbarBackgroundColor,
           },
           headerTintColor: accentColor,
-          headerTitle: "Study Buddy",
+          headerTitle: "StudyBuddy",
+          headerTitleAlign: 'left',
+          headerRight: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity onPress={() => alert('Notifications will go here')} style={{ marginRight: doubleBaseUnit }}>
+                <MaterialIcons name="notifications-none" size={baseIconSize} color={accentColor} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => alert('Add a new person')} style={{ marginRight: doubleBaseUnit }}>
+                <MaterialIcons name="person-add-alt" size={baseIconSize} color={accentColor} />
+              </TouchableOpacity>
+            </View>
+          ),
         }}
       >
         <Tab.Screen
