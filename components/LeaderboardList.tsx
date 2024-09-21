@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { MoreMenu } from './MoreMenu';
 import { accentColor, backgroundColor, baseIconSize, baseUnit, bodyFontSize, doubleBaseUnit } from '../styles/styles';
 import LocalState from '../LocalState';
+import axios from 'axios';
 
 export function LeaderboardList() {
   const localState = LocalState.getInstance(); // Access the singleton instance
@@ -12,6 +13,60 @@ export function LeaderboardList() {
   const [selectedTab, setSelectedTab] = useState('Friends');
   const [members, setMembers] = useState(initialGroupMembersData['Friends']);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+
+  const [groups, setGroups] = useState<{ [key: number]: string }>({});
+  const [groupMembersData, setGroupMembersData] = useState<{ [key: string]: { name: string, hours: number }[] }>({});
+
+  useEffect(() => {
+    // Fetch study groups from the API
+    const fetchStudyGroups = async () => {
+      try {
+        const response = await axios.get(`http://192.168.211.174:3000/api/user/1/studyGroups`); // Change userId as needed
+        console.log("AYA response", response);
+
+        // Access data directly from response
+        const groupData = response.data.studyGroups.reduce((acc: { [key: number]: string }, group: { id: number, name: string, start: string, end: string, isAutomatched: boolean }) => {
+          acc[group.id] = group.name; 
+          return acc;
+        }, {});
+
+        setGroups(groupData);
+
+        // Fetch members for each group
+        const groupIds = Object.keys(groupData);
+        for (const groupId of groupIds) {
+          const groupName = groupData[Number(groupId)];
+          await fetchGroupMembers(Number(groupId), groupName);
+        }
+
+      } catch (error: any) {
+        console.error('Error fetching study groups:', error.message || error);
+      }
+    };
+
+    // Function to fetch the member data for a specific group
+    const fetchGroupMembers = async (groupId: number, groupName: string) => {
+      try {
+        const response = await axios.get(`http://192.168.211.174:3000/api/groups/${groupId}/members`);
+        console.log(`Fetching members for group ${groupName}`, response.data);
+
+        // Update groupMembersData state with the fetched member data
+        setGroupMembersData(prevState => ({
+          ...prevState,
+          [groupName]: response.data.members
+        }));
+      } catch (error: any) {
+        console.error(`Error fetching members for group ${groupName}:`, error.message || error);
+      }
+    };
+
+    fetchStudyGroups();
+  }, []);
+
+  console.log("AYA groups", groups);
+  console.log("AYA groupMembersData", groupMembersData);
+
+
 
   const handleGroupSelect = (group: string) => {
     setSelectedTab(group);
