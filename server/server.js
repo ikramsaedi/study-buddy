@@ -120,7 +120,6 @@ app.get("/api/match", (req, res) => {
                         return;
                       }
 
-                      console.log("wtf is this?", this.lastID); // Get the new group's ID
                       const newGroupId = this.lastID; // Get the new group's ID
 
                       // Step 5: Add users to user_group table
@@ -169,13 +168,6 @@ app.post("/api/addStudySession", (req, res) => {
     (typeof durationMinutes !== "number" && !durationMinutes) ||
     !tag
   ) {
-    console.log("loaf are we in here?", {
-      userId,
-      start,
-      end,
-      durationMinutes,
-      tag,
-    });
     return res
       .status(400)
       .json({ error: "Invalid request or unauthorized user" });
