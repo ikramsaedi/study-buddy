@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import * as SQLite from "expo-sqlite";
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { Leaderboard } from "./pages/Leaderboard";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -9,6 +9,7 @@ import { Tracker } from "./pages/Tracker";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import CreateGroupButton from "./components/CreateGroupButton";
+
 
 import {
   accentColor,

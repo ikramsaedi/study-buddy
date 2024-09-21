@@ -1,17 +1,19 @@
-// StatCard.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { bodyFontSize, doubleBaseUnit, baseUnit, LargeNumberText, smallerTitleFontSize, smallFontSize } from '../styles/styles';
+import LocalState from '../LocalState'; // Import the LocalState
 
-type StatCardProps = {
-  hoursStudied: { hours: number; minutes: number };
-  longestSession: { hours: number; minutes: number };
-  sessions: number;
-  types: number;
-  formattedDate: string;
-};
+// Fetch user data
+const localState = LocalState.getInstance();
+const userData = localState.getUserData();
 
-export function StatCard({ hoursStudied, longestSession, sessions, types, formattedDate }: StatCardProps) {
+export function StatCard() {
+  const hoursStudied = { hours: Math.floor(userData.hours), minutes: (userData.hours % 1) * 60 };
+  const longestSession = { hours: Math.floor(userData.longestSession), minutes: (userData.longestSession % 1) * 60 };
+  const sessions = userData.sessions;
+  const types = userData.types;
+  const formattedDate = new Date().toLocaleDateString("en-AU", { day: 'numeric', month: 'long' });
+
   return (
     <View style={styles.statsContainer}>
       <Text style={styles.dateText}>Today - {formattedDate}</Text>
