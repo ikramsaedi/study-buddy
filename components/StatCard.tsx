@@ -46,7 +46,7 @@ export function StatCard() {
     fetchStats();
 
     // Set an interval to fetch stats every 5 seconds
-    const intervalId = setInterval(fetchStats, 5000);
+    const intervalId = setInterval(fetchStats, 2000);
 
     // Cleanup the interval when component unmounts
     return () => clearInterval(intervalId);

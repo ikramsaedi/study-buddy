@@ -87,7 +87,7 @@ export function LeaderboardList() {
     loadGroups();
 
     // Set an interval to fetch stats every 5 seconds
-    const intervalId = setInterval(loadGroups, 5000);
+    const intervalId = setInterval(loadGroups, 2000);
 
     // Cleanup the interval when component unmounts
     return () => clearInterval(intervalId);
