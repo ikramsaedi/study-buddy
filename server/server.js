@@ -195,6 +195,102 @@ app.post("/api/addStudySession", (req, res) => {
   });
 });
 
+// Fetch user stats for today
+app.get("/api/user/:id/stats", (req, res) => {
+  const userId = req.params.id;
+
+  const query = `
+    SELECT
+      SUM(durationMinutes) as totalMinutes,
+      MAX(durationMinutes) as longestSession,
+      COUNT(*) as sessions,
+      COUNT(DISTINCT tag) as types
+    FROM studySession
+    WHERE userId = ?
+    AND DATE(start) = DATE('now') -- Filter for today's date
+  `;
+
+  db.get(query, [userId], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      totalMinutes: row.totalMinutes || 0,
+      longestSession: row.longestSession || 0,
+      sessions: row.sessions || 0,
+      types: row.types || 0
+    });
+  });
+});
+
+
+// API endpoint to get all study groups for a user
+app.get("/api/user/:id/studyGroups", (req, res) => {
+  const userId = req.params.id;
+
+  const query = `
+    SELECT sg.id, sg.name, sg.start, sg.end, sg.isAutomatch
+    FROM studyGroup sg
+    INNER JOIN user_studyGroup usg ON sg.id = usg.studyGroupId
+    WHERE usg.userId = ?
+  `;
+
+  db.all(query, [userId], (err, rows) => {
+    if (err) {
+      console.error('Database error:', err.message); // Log the exact error for debugging
+      res.status(500).json({ error: err.message });
+      return;
+    }
+
+    if (rows.length === 0) {
+      res.status(404).json({ error: 'No study groups found for this user' });
+      return;
+    }
+
+    res.json({ studyGroups: rows });
+  });
+});
+
+// API endpoint to get all members and their total minutes for a study group (filtered by group's start and end dates)
+app.get("/api/groups/:id/members", (req, res) => {
+  const groupId = req.params.id;
+
+  const query = `
+    SELECT u.name, 
+           COALESCE(SUM(ss.durationMinutes), 0) AS minutes
+    FROM user u
+    INNER JOIN user_studyGroup usg ON u.id = usg.userId
+    LEFT JOIN studySession ss ON u.id = ss.userId
+    WHERE usg.studyGroupId = ?
+      AND (ss.start IS NULL OR (ss.start >= (SELECT start FROM studyGroup WHERE id = ?)
+      AND (SELECT end FROM studyGroup WHERE id = ?) IS NULL OR ss.start <= (SELECT end FROM studyGroup WHERE id = ?)))
+    GROUP BY u.id
+  `;
+
+  db.all(query, [groupId, groupId, groupId, groupId], (err, rows) => {
+    if (err) {
+      console.error('Database error:', err.message); // Log the exact error for debugging
+      res.status(500).json({ error: err.message });
+      return;
+    }
+
+    if (rows.length === 0) {
+      res.status(404).json({ error: 'No members found for this group' });
+      return;
+    }
+
+    // Return only name and minutes for each member
+    const members = rows.map(row => ({
+      name: row.name,
+      minutes: row.minutes
+    }));
+
+    res.json({ members });
+  });
+});
+
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

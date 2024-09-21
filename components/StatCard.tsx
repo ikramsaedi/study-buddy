@@ -1,18 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { bodyFontSize, doubleBaseUnit, baseUnit, LargeNumberText, smallerTitleFontSize, smallFontSize } from '../styles/styles';
-import LocalState from '../LocalState'; // Import the LocalState
-
-// Fetch user data
-const localState = LocalState.getInstance();
-const userData = localState.getUserData();
+import axios from 'axios';
 
 export function StatCard() {
-  const hoursStudied = { hours: Math.floor(userData.hours), minutes: (userData.hours % 1) * 60 };
-  const longestSession = { hours: Math.floor(userData.longestSession), minutes: (userData.longestSession % 1) * 60 };
-  const sessions = userData.sessions;
-  const types = userData.types;
+  const [userStats, setUserStats] = useState({
+    totalMinutes: 0,
+    longestSession: 0,
+    sessions: 0,
+    types: 0,
+  });
+
   const formattedDate = new Date().toLocaleDateString("en-AU", { day: 'numeric', month: 'long' });
+
+  // Fetch user statistics from the API
+  useEffect(() => {
+    const userId = 1; // Replace this with the actual logged-in user ID
+
+    // We have to replace this url with your IP Address
+    axios.get(`http://192.168.211.174:3000/api/user/${userId}/stats`)
+      .then(response => {
+        setUserStats(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching user stats:', error);
+      });
+  }, []);
+
+  const hoursStudied = {
+    hours: Math.floor(userStats.totalMinutes / 60),
+    minutes: userStats.totalMinutes % 60,
+  };
+  const longestSession = {
+    hours: Math.floor(userStats.longestSession / 60),
+    minutes: userStats.longestSession % 60,
+  };
 
   return (
     <View style={styles.statsContainer}>
@@ -26,7 +48,7 @@ export function StatCard() {
         {/* Extra stats row */}
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{sessions}</Text>
+            <Text style={styles.statNumber}>{userStats.sessions}</Text>
             <Text style={styles.statLabel}>Sessions</Text>
           </View>
           <View style={styles.statItem}>
@@ -34,7 +56,7 @@ export function StatCard() {
             <Text style={styles.statLabel}>Longest</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{types}</Text>
+            <Text style={styles.statNumber}>{userStats.types}</Text>
             <Text style={styles.statLabel}>Types</Text>
           </View>
         </View>
