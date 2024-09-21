@@ -77,7 +77,15 @@ export const Profile = () => {
           />
         </View>
         <Text style={styles.profileName}>{profileData.name}</Text>
-        <TouchableOpacity style={styles.editButton}  onPress={() => Alert.alert("Not Implemented", "This feature is not part of the MVP.")}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() =>
+            Alert.alert(
+              "Not Implemented",
+              "This feature is not part of the MVP."
+            )
+          }
+        >
           <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
         <View style={styles.statsContainer}>

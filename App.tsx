@@ -17,16 +17,20 @@ import {
   doubleBaseUnit,
 } from "./styles/styles";
 
+// We use tab navigator for the bottom navbar
 const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
+        // Loads you into Leaderboard page by default
         initialRouteName="Leaderboard"
+        // Sets background colour
         sceneContainerStyle={{ backgroundColor: backgroundColor }}
         screenOptions={{
           tabBarStyle: { backgroundColor: navbarBackgroundColor },
+          // Sets currently active tab colour
           tabBarActiveTintColor: accentColor,
           headerStyle: { backgroundColor: navbarBackgroundColor },
           headerTintColor: accentColor,

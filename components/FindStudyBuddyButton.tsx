@@ -15,7 +15,7 @@ export function FindBuddyButton({ onMatchFound }: FindBuddyButtonProps) {
 
   useEffect(() => {
     const checkAutoMatchGroup = () => {
-      const userInGroup = false; // Replace with actual logic to check
+      const userInGroup = false;
       setIsInAutoMatchGroup(userInGroup);
     };
 
@@ -26,7 +26,7 @@ export function FindBuddyButton({ onMatchFound }: FindBuddyButtonProps) {
     try {
       const response = await axios.get(`${ROOT_URL}/api/match`, {
         params: {
-          userId: localState.getUserDataId()
+          userId: localState.getUserDataId(),
         },
       });
 
