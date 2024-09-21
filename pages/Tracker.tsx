@@ -61,6 +61,7 @@ export const Tracker = () => {
           startStopwatch={startStopwatch}
           pauseStopwatch={pauseStopwatch}
           resetStopwatch={resetStopwatch}
+          time={time}
         />
       </View>
     </>

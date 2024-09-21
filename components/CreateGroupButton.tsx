@@ -14,10 +14,7 @@ const CreateGroupButton = () => {
 
       const response = await axios.get(
         // we will need to change the ip, but for now it is running on cham's machine
-        "http://192.168.211.46:3000/api/match",
-        {
-          params: { degree, course, goalMinutes },
-        }
+        "http://192.168.169.2:3000/api/courses"
       );
 
       const matchedUser = response.data.match;
