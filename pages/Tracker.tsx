@@ -1,8 +1,6 @@
 import React, { useState, useRef } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { styles } from "../styles/styles"; // Ensure this path is correct
 
 export const Tracker = () => {
   // State and refs to manage time and stopwatch status
@@ -53,69 +51,146 @@ export const Tracker = () => {
   };
 
   return (
-    <View style={styles.timer_container}>
-      {/* <Text style={styles.titleText}>Tracker</Text> */}
-      {/* Study Tracker Header */}
-      <Text style={styles.startText}>Start tracking study now!</Text>
+    <>
+      <View style={styles.timer_container}>
+        <Text style={styles.startText}>Start tracking study now!</Text>
 
-      {/* Circular Tracker */}
-      <View style={styles.trackerBackground}>
-        <View style={styles.trackerContainer}>
-          <Text style={styles.timeText}>{formatTime(time)}</Text>
+        {/* Circular Time Tracker */}
+        <View style={styles.trackerBackground}>
+          <View style={styles.trackerContainer}>
+            <Text style={styles.timeText}>{formatTime(time)}</Text>
+          </View>
+        </View>
+
+        {/* Play/Pause/Reset Button */}
+        <View style={styles.buttonContainer}>
+          {running ? (
+            <>
+              {/* stop stopwatch */}
+              <TouchableOpacity
+                style={styles.playButtonContainer}
+                onPress={() => {
+                  // pauses stopwatch
+                  pauseStopwatch();
+
+                  // fires alert
+                  Alert.alert(
+                    "Add Hours", // title
+                    "Would you like to add the tracked hours to your total study time?", // message
+                    [
+                      {
+                        text: "No",
+                        onPress: () => resetStopwatch(),
+                        style: "cancel",
+                      },
+                      {
+                        text: "Yes",
+                        onPress: () => resetStopwatch(),
+                      },
+                    ],
+                    { cancelable: true }
+                  );
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="stop"
+                  color={"#D74A76"}
+                  size={50}
+                />
+              </TouchableOpacity>
+              {/* pause stopwatch */}
+              <TouchableOpacity
+                style={styles.playButtonContainer}
+                onPress={pauseStopwatch}
+              >
+                <MaterialCommunityIcons
+                  name="pause"
+                  color={"#D74A76"}
+                  size={50}
+                />
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              {/* starts stopwatch  */}
+              <TouchableOpacity
+                style={styles.playButtonContainer}
+                onPress={startStopwatch}
+              >
+                <MaterialCommunityIcons
+                  name="play"
+                  color={"#D74A76"}
+                  size={50}
+                />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
-
-      {/* Play/Pause/Reset Button */}
-      <View style={styles.buttonContainer}>
-        {running ? (
-          // pause button
-          <>
-            <TouchableOpacity
-              style={styles.playButtonContainer}
-              onPress={pauseStopwatch}
-            >
-              <MaterialCommunityIcons name="stop" color={"#D74A76"} size={60} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.playButtonContainer}
-              onPress={pauseStopwatch}
-            >
-              <MaterialCommunityIcons
-                name="pause"
-                color={"#D74A76"}
-                size={60}
-              />
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            {/* starts stopwatch  */}
-            <TouchableOpacity
-              style={styles.playButtonContainer}
-              onPress={startStopwatch}
-            >
-              <MaterialCommunityIcons name="play" color={"#D74A76"} size={60} />
-            </TouchableOpacity>
-            {/* resets stopwatch */}
-            {/* <TouchableOpacity
-              style={styles.playButtonContainer}
-              onPress={resetStopwatch}
-            >
-              <Text style={styles.buttonText}>Reset</Text>
-              <MaterialCommunityIcons name="play" color={"#1D192B"} size={20} />
-            </TouchableOpacity> */}
-          </>
-        )}
-
-        {/* {!running && time > 0 && (
-          <TouchableOpacity
-            style={styles.playButtonContainer}
-            onPress={startStopwatch}
-          >
-            <MaterialCommunityIcons name="play" color={"#D74A76"} size={60} />
-          </TouchableOpacity>
-        )} */}
-      </View>
-    </View>
+    </>
   );
 };
+
+const styles = StyleSheet.create({
+  timer_container: {
+    flex: 1,
+    backgroundColor: "#E9DEEE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  trackerBackground: {
+    width: 350,
+    height: 350,
+    borderRadius: 350,
+    borderWidth: 30,
+    borderColor: "#F3EDF7",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F3EDF7",
+  },
+  trackerContainer: {
+    width: 325,
+    height: 325,
+    borderRadius: 325,
+    borderWidth: 30,
+    borderColor: "#C0A9E6",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F5F1FB",
+  },
+  timeText: {
+    fontSize: 40,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  startText: {
+    marginBottom: 50,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#555",
+  },
+  playButtonContainer: {
+    marginTop: 30,
+    margin: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+    width: 80,
+    height: 80,
+    borderRadius: 100,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  playButton: {
+    width: 30,
+    height: 30,
+    backgroundColor: "#E74C3C", // Red for the play button
+    borderRadius: 5,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+  },
+});
