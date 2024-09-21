@@ -28,6 +28,26 @@ app.get("/api/courses", (req, res) => {
   });
 });
 
+// API route to find a matching user
+app.get("/api/match", (req, res) => {
+  console.log("LOAF!!!");
+  const { degree, course, goalMinutes } = req.query;
+  sql = `SELECT * FROM user
+     WHERE degree = ?
+     AND id IN (SELECT userId FROM user_course WHERE courseId = ?)
+     ORDER BY ABS(goalMinutes - ?) ASC
+     LIMIT 1`;
+
+  db.all(sql, [degree, course, goalMinutes], (err, rows) => {
+    if (err) {
+      console.log("Database error:", err.message); // Log the error
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json({ match: rows[0] || null });
+    }
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
