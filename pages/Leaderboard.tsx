@@ -17,22 +17,34 @@ export function Leaderboard() {
   useEffect(() => {
     const checkIfMatched = async () => {
       try {
+        // Get the current datetime in ISO format
+        const currentDatetime = new Date().toISOString();
+        
+        // Make the API call with the userId and the current datetime
         const response = await axios.get(`${ROOT_URL}/api/isUserInMatchedGroup`, {
-          params: { userId: localState.getUserDataId() }, // Replace with actual user ID
+          params: {
+            userId: localState.getUserDataId(), // Replace with actual user ID
+            currentDatetime: currentDatetime // Pass the current datetime
+          },
         });
+        
+        // Update state based on whether the user is in a matched group
         setIsInMatchedGroup(response.data.isInMatchedGroup);
       } catch (error) {
         console.error("Error checking matched group:", error);
       }
-    };
+  };
 
-    checkIfMatched();
+  checkIfMatched();
   }, []);
+
 
   const handleMatchFound = (matchedUser: string) => {
     Alert.alert(`Matched with: ${matchedUser}`);
     setMatchedUser(matchedUser);
   };
+
+  console.log("isInMatchedGroup", isInMatchedGroup);
 
   return (
     <ScrollView>

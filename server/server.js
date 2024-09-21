@@ -48,11 +48,13 @@ app.get("/api/match", (req, res) => {
       console.log("degree:", degree);
       console.log("goalMinutes:", goalMinutes);
 
-      // Step 2: Check if the user is already in an auto-match group
+      // Step 2: Check if the user is already in an active auto-match group
       db.get(
         `SELECT * FROM user_studyGroup usg
          JOIN studyGroup sg ON usg.studyGroupId = sg.id
-         WHERE usg.userId = ? AND sg.isAutomatch = 1`,
+         WHERE usg.userId = ? 
+           AND sg.isAutomatch = 1
+           AND DATETIME('now') BETWEEN sg.start AND sg.end`, // Check if the group is still active
         [userId],
         (err, row) => {
           if (err) {
@@ -62,7 +64,7 @@ app.get("/api/match", (req, res) => {
           }
 
           if (row) {
-            res.json({ message: "User is already in an auto-match group" });
+            res.json({ message: "User is already in an active auto-match group" });
           } else {
             // Step 3: Find a match based on degree and goalMinutes
             db.get(
@@ -115,7 +117,7 @@ app.get("/api/match", (req, res) => {
                     [1, now, end],
                     function (err) {
                       if (err) {
-                        console.log("forth", err.message);
+                        console.log("fourth", err.message);
                         res.status(500).json({ error: err.message });
                         return;
                       }
@@ -154,23 +156,35 @@ app.get("/api/match", (req, res) => {
   );
 });
 
-// API route to if user is already in a matched group
+// API route to check if user is already in a matched group and if the group is active
 app.get("/api/isUserInMatchedGroup", (req, res) => {
-  const { userId } = req.query;
+  const { userId, currentDatetime } = req.query;
 
-  // Step 1: Check if the user is already in an auto-match group
+  // Log the userId and currentDatetime for debugging purposes
+  console.log("Checking for userId:", userId, "at datetime:", currentDatetime);
+
+  // Convert the ISO 8601 datetime to SQLite compatible format (YYYY-MM-DD HH:MM:SS)
+  const formattedDatetime = currentDatetime.replace('T', ' ').split('.')[0]; // Remove 'T' and milliseconds
+
+  // Query to check if the user is in an active auto-match group
   db.get(
     `SELECT * FROM user_studyGroup usg
      JOIN studyGroup sg ON usg.studyGroupId = sg.id
-     WHERE usg.userId = ? AND sg.isAutomatch = 1`,
-    [userId],
+     WHERE usg.userId = ?
+     AND sg.isAutomatch = 1 
+     AND DATETIME(?) >= DATETIME(sg.start)
+     AND DATETIME(?) <= DATETIME(sg.end)`, // Check if the group is still active
+    [userId, formattedDatetime, formattedDatetime],
     (err, row) => {
       if (err) {
+        console.log("Error fetching user group:", err.message);
         res.status(500).json({ error: err.message });
         return;
       }
 
-      // If row exists, user is already in an auto-match group
+      console.log("Query result:", row); // Log the query result for debugging
+
+      // If row exists, user is already in an active auto-match group
       if (row) {
         res.json({ isInMatchedGroup: true });
       } else {
