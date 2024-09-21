@@ -219,11 +219,10 @@ app.get("/api/user/:id/stats", (req, res) => {
       totalMinutes: row.totalMinutes || 0,
       longestSession: row.longestSession || 0,
       sessions: row.sessions || 0,
-      types: row.types || 0
+      types: row.types || 0,
     });
   });
 });
-
 
 // API endpoint to get all study groups for a user
 app.get("/api/user/:id/studyGroups", (req, res) => {
@@ -238,13 +237,13 @@ app.get("/api/user/:id/studyGroups", (req, res) => {
 
   db.all(query, [userId], (err, rows) => {
     if (err) {
-      console.error('Database error:', err.message); // Log the exact error for debugging
+      console.error("Database error:", err.message); // Log the exact error for debugging
       res.status(500).json({ error: err.message });
       return;
     }
 
     if (rows.length === 0) {
-      res.status(404).json({ error: 'No study groups found for this user' });
+      res.status(404).json({ error: "No study groups found for this user" });
       return;
     }
 
@@ -270,26 +269,51 @@ app.get("/api/groups/:id/members", (req, res) => {
 
   db.all(query, [groupId, groupId, groupId, groupId], (err, rows) => {
     if (err) {
-      console.error('Database error:', err.message); // Log the exact error for debugging
+      console.error("Database error:", err.message); // Log the exact error for debugging
       res.status(500).json({ error: err.message });
       return;
     }
 
     if (rows.length === 0) {
-      res.status(404).json({ error: 'No members found for this group' });
+      res.status(404).json({ error: "No members found for this group" });
       return;
     }
 
     // Return only name and minutes for each member
-    const members = rows.map(row => ({
+    const members = rows.map((row) => ({
       name: row.name,
-      minutes: row.minutes
+      minutes: row.minutes,
     }));
 
     res.json({ members });
   });
 });
 
+// Endpoint to get user profile information
+app.get("/api/profile", (req, res) => {
+  const { userId } = req.query;
+
+  // Query the user information from the database
+  db.get(
+    `SELECT name, gender, degree, pronouns, goalMinutes
+     FROM user
+     WHERE id = ?`,
+    [userId],
+    (err, user) => {
+      if (err) {
+        console.log("Error getting user profile:", err.message);
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      if (!user) {
+        console.log("User not found");
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
+      res.json({ user });
+    }
+  );
+});
 
 // Start server
 app.listen(PORT, () => {
