@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
 import { doubleBaseUnit, bodyFontSize, accentColor } from "../styles/styles";
+import { ROOT_URL } from "../config";
 
 type FindBuddyButtonProps = {
   onMatchFound: (matchedUser: string) => void;
@@ -21,7 +22,7 @@ export function FindBuddyButton({ onMatchFound }: FindBuddyButtonProps) {
 
   const findStudyBuddy = async () => {
     try {
-      const response = await axios.get("http://192.168.211.46:3000/api/match", {
+      const response = await axios.get(`${ROOT_URL}/api/match`, {
         params: {
           userId: 1, // Replace with the actual user ID dynamically if needed
         },
