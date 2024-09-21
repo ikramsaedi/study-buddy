@@ -20,4 +20,49 @@ export const styles = StyleSheet.create({
   bodyText: {
     color: textColor,
   },
+  timer_container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  header: {
+    fontSize: 30,
+    color: "green",
+    marginBottom: 10,
+  },
+  subHeader: {
+    fontSize: 18,
+    marginBottom: 10,
+    color: "blue",
+  },
+  timeText: {
+    fontSize: 48,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+  },
+  button: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  startButton: {
+    backgroundColor: "#2ecc71",
+    marginRight: 10,
+  },
+  resetButton: {
+    backgroundColor: "#e74c3c",
+    marginRight: 10,
+  },
+  pauseButton: {
+    backgroundColor: "#f39c12",
+  },
+  resumeButton: {
+    backgroundColor: "#3498db",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+  },
 });
