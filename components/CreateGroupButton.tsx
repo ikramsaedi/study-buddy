@@ -1,27 +1,37 @@
 import React from "react";
 import { TouchableOpacity, Alert } from "react-native";
 import axios from "axios";
-import { baseIconSize, accentColor, doubleBaseUnit } from "../styles/styles";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { ROOT_URL } from "../config";
+import { baseIconSize, accentColor, doubleBaseUnit } from "../styles/styles";
 
 const CreateGroupButton = () => {
-  const findCourses = async () => {
+  const findAutoMatch = async () => {
     try {
+      // Set query parameters for matching
+      const degree = 1; // Example degree, replace dynamically
+      const course = 1; // Example course ID, replace dynamically
+      const goalMinutes = 120; // Example goal minutes, replace dynamically
+
       const response = await axios.get(
         // we will need to change the ip, but for now it is running on cham's machine
         `${ROOT_URL}/api/courses`
       );
-      console.log("Courses:", response.data.courses);
-      Alert.alert("Courses loaded!");
+
+      const matchedUser = response.data.match;
+      if (matchedUser) {
+        Alert.alert(`Matched with: ${matchedUser.name}`);
+      } else {
+        Alert.alert("No matching user found.");
+      }
     } catch (error) {
-      console.error("Error fetching courses:", error);
+      console.error("Error finding match:", error);
     }
   };
 
   return (
     <TouchableOpacity
-      onPress={findCourses}
+      onPress={findAutoMatch}
       style={{ marginRight: doubleBaseUnit }}
     >
       <MaterialIcons
