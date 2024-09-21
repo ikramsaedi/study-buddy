@@ -1,34 +1,26 @@
 import React from "react";
-import { TouchableOpacity } from "react-native";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { TouchableOpacity, Alert } from "react-native";
+import axios from "axios";
 import { baseIconSize, accentColor, doubleBaseUnit } from "../styles/styles";
-import * as SQLite from "expo-sqlite";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-interface CreateGroupButtonProps {
-  db: SQLite.SQLiteDatabase | null;
-}
-
-const CreateGroupButton: React.FC<CreateGroupButtonProps> = ({ db }) => {
-  const findAutoMatch = async () => {
-    console.log("Finding match...");
-    if (db) {
-      try {
-        const result = await db.getFirstAsync("SELECT * FROM user LIMIT 1");
-        console.log(result.id);
-        if (result) {
-          console.log("Matched");
-        } else {
-          console.log("No matching user found.");
-        }
-      } catch (error) {
-        console.log("Error finding match: ", error);
-      }
+const CreateGroupButton = () => {
+  const findCourses = async () => {
+    try {
+      const response = await axios.get(
+        // we will need to change the ip, but for now it is running on cham's machine
+        "http://192.168.211.46:3000/api/courses"
+      );
+      console.log("Courses:", response.data.courses);
+      Alert.alert("Courses loaded!");
+    } catch (error) {
+      console.error("Error fetching courses:", error);
     }
   };
 
   return (
     <TouchableOpacity
-      onPress={findAutoMatch}
+      onPress={findCourses}
       style={{ marginRight: doubleBaseUnit }}
     >
       <MaterialIcons
