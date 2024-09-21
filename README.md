@@ -84,3 +84,67 @@ If you have any issues running the server try:
 
 - brew install watchman
 - reinstalling node modules
+
+# How we built it
+
+### Brainstorming
+
+We began by brainstorming ways to enhance the student experience, generating a variety of ideas. After gathering unbiased feedback from three individuals, we ultimately decided to develop the StudyBuddy app.
+
+### Design
+
+On the Friday evening before development, we collaborated in Figma to create our designs. You can view our design mockups here: [Figma Design Link](https://www.figma.com/design/vtZKXpnQCeHXoxGiqOsvEP/Hackathon?node-id=0-1&node-type=canvas&t=Al2fL83IKAlyOkpB-0).
+
+### Frontend
+
+We built our app using Expo and React Native, using our designs to create functional pages. The frontend makes requests to the backend server as needed; for example, it uses a POST request to fetch a user's logged study hours from the database for display within the app.
+
+#### Performance concerns
+
+We have implemented short polling for the leaderboard page so that we get live updates. So for every 2 seconds, we update the page. We didn't have time to consider implementing something like SSE (Server Sent Events).
+
+### Database
+
+To organise our data, we created ERD diagrams that mapped out the relationships between tables. We chose SQLite for our database because it’s locally stored, eliminating the need for cloud hosting and simplifying the setup process.
+
+### Server
+
+We used an Express server that connects to our SQLite database. The server features multiple routes, including GET and POST requests, to interact with the database. The frontend is it's only client.
+
+### Deployment
+
+We deployed both the server and database on [Render](https://dashboard.render.com/) using a paid tier option. The React Native frontend was deployed using Expo Application Services.
+
+## Challenges we ran into
+
+### expo-sqlite Library Issues
+
+We encountered problems with the expo-sqlite library, which didn't work with an existing SQLite database. This led to significant time wasted in troubleshooting. As a workaround, we ended up writing a Node server to manage our backend needs.
+
+### Deployment Challenges
+
+While deploying the Node server on Render, we faced limitations with the free tier, which caused the server to go down every 15 minutes. To avoid time constraints, we decided to upgrade to a paid tier.
+
+### Learning New Technologies
+
+We had to quickly learn and adapt to several new technologies, including React Native, Node, Express, SQLite, and Expo, which added to our workload and time used.
+
+### Time Constraints
+
+The time constraint was impacted the decision making in our development process.
+
+### Compatibility Issues
+
+RMIT's internet was not compatible with running Expo, which took time to debug and forced us to use our personal mobile data to run our application.
+
+## Accomplishments that we're proud of
+
+We are proud of several accomplishments from our project. Throughout the process, we gained knowledge on new technologies such as, integrating the server, database, and front end, allowing us to experience the entire development process. We also explored numerous new tech experiences such as, deploying the front-end React Native app to Expo Application Services and the server to Render, which was complex but very fulfilling. Our team member Ikram also dedicatedly sacrificed her concert plans to focus on our hackathon project, demonstrating her commitment to our team!
+
+## What we learned
+
+While developing, we worked with new technologies, such as React Native, Node, Express, SQLite, and Expo, which allowed us to skill build. We also improved our time management abilities by implementing time-blocking techniques, allowing us to stay organised and focused. Additionally, we learned the importance of teamwork and communication; understanding each other’s strengths and perspectives was vital to our success.
+
+## What's next for Study Buddy
+
+We'd like to understand about how we can keep on supporting community within this application. This could mean adding chats or reactions to send to fellow peers when they are more productive or need cheering up!
