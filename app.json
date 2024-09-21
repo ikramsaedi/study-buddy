@@ -1,5 +1,8 @@
 {
   "expo": {
+    "experiments": {
+      "baseUrl": "/study-buddy"
+    },
     "name": "study-buddy",
     "slug": "study-buddy",
     "version": "1.0.0",
@@ -19,8 +22,7 @@
       },
       "package": "com.ikramsaedi.studybuddy"
     },
-    "web": {
-    },
+    "web": {},
     "extra": {
       "eas": {
         "projectId": "c88aa106-1c12-4375-9dfb-011df146f6ac"
