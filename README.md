@@ -37,7 +37,7 @@ NOTE: This doesn't work on RMIT wifi for some reason. You will need to hotspot o
 1. Run `npm install` in this directory to install all your packages.
 2. To run the React Native frontend development server, run `npx expo start --web`
 3. To run the backend node server, `cd server`, then run `node server.js`.
-4. You will need to change the `DEVELOPMENT_URL` in `config.ts` to your IP address with port 3000. Should look something like this: http://192.168.211.140:3000
+4. You will need to change the `DEVELOPER_URL` in `config.ts` to your IP address with port 3000. Should look something like this: http://192.168.211.140:3000
 5. Then go to http://localhost:8081, and it should work!
 
 ### Run on phone
