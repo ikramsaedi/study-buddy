@@ -4,6 +4,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import { MoreMenu } from './MoreMenu';
 import { accentColor, backgroundColor, baseIconSize, baseUnit, bodyFontSize, doubleBaseUnit } from '../styles/styles';
 import { fetchGroupMembers, fetchStudyGroups } from '../helpers/leaderboardService';
+import LocalState from '../LocalState'; // Import LocalState
 
 export function LeaderboardList() {
   const [selectedTab, setSelectedTab] = useState('');
@@ -11,18 +12,18 @@ export function LeaderboardList() {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [groups, setGroups] = useState<{ [key: number]: string }>({});
   
-  // UseRef to store group data across renders without causing re-renders
   const groupWithData = useRef<{ [key: string]: { name: string; minutes: number }[] }>({});
+
+  // Get the current user from LocalState
+  const currentUser = LocalState.getInstance().getUserData(); // Assuming this returns { name: string }
 
   // Fetch members for the selected group and update state
   const fetchAndSetMembers = async (groupName: string) => {
     const groupId = parseInt(Object.keys(groups).find(key => groups[parseInt(key)] === groupName) || '', 10);
     if (groupWithData.current[groupName]) {
-      // If the group data is already cached, use it and sort by minutes in descending order
       const sortedMembers = groupWithData.current[groupName].sort((a, b) => b.minutes - a.minutes);
       setMembers(sortedMembers);
     } else if (!isNaN(groupId)) {
-      // Otherwise, fetch the group members and cache it
       const groupMembers = await fetchGroupMembers(groupId);
       groupWithData.current[groupName] = groupMembers;
       const sortedMembers: { name: string; minutes: number }[] = groupMembers.sort((a: { name: string; minutes: number }, b: { name: string; minutes: number }) => b.minutes - a.minutes);
@@ -31,20 +32,17 @@ export function LeaderboardList() {
   };
 
   useEffect(() => {
-    // Fetch study groups and set the default tab
     const loadGroups = async () => {
       const groupData = await fetchStudyGroups();
       setGroups(groupData);
 
-      // Set default tab to the first group (first key in groupData)
       const firstGroupName = groupData[Object.keys(groupData)[0]];
       setSelectedTab(firstGroupName);
       
-      // Fetch members for the first group and cache it, then sort
       const groupId = parseInt(Object.keys(groupData)[0], 10);
       const groupMembers = await fetchGroupMembers(groupId);
       groupWithData.current[firstGroupName] = groupMembers;
-      const sortedMembers = groupMembers.sort((a: { name: string; minutes: number }, b: { name: string; minutes: number }) => b.minutes - a.minutes); 
+      const sortedMembers = groupMembers.sort((a: { name: string; minutes: number }, b: { name: string; minutes: number }) => b.minutes - a.minutes);
       setMembers(sortedMembers);
     };
 
@@ -53,18 +51,16 @@ export function LeaderboardList() {
 
   const handleGroupSelect = (group: string) => {
     setSelectedTab(group);
-    fetchAndSetMembers(group); // Fetch and display members when the tab is switched
+    fetchAndSetMembers(group);
   };
 
   const handleCreateGroup = (groupName: string) => {
-    // fix this
     setSelectedTab(groupName);
     setMembers([{ name: 'You', minutes: 0 }]);
   };
 
   return (
     <>
-      {/* Group tabs */}
       <View style={styles.tabsWrapper}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
           {Object.keys(groups).map(groupId => (
@@ -78,7 +74,6 @@ export function LeaderboardList() {
         </TouchableOpacity>
       </View>
 
-      {/* More Menu */}
       <MoreMenu
         visible={showMoreMenu}
         onClose={() => setShowMoreMenu(false)}
@@ -88,13 +83,18 @@ export function LeaderboardList() {
       {/* Leaderboard List */}
       <View style={styles.leaderboardContainer}>
         {members.map((user, index) => (
-          <View key={index} style={styles.leaderboardItem}>
-            <Text style={styles.rankText}>{index + 1}</Text>
+          <View 
+            key={index} 
+            style={styles.leaderboardItem}
+          >
+            <Text style={[styles.rankText, user.name === currentUser.name ? styles.highlightedText : null]}>{index + 1}</Text>
             <View style={styles.profilePicPlaceholder} />
             <View style={styles.userContainer}>
-              <Text style={styles.userName}>{user.name}</Text>
+              <Text style={[styles.userName, user.name === currentUser.name ? styles.highlightedText : null]}>{user.name}</Text>
             </View>
-            <Text style={styles.hoursText}>{Math.floor(user.minutes / 60)}h {user.minutes % 60}m</Text>
+            <Text style={[styles.hoursText, user.name === currentUser.name ? styles.highlightedText : null]}>
+              {Math.floor(user.minutes / 60)}h {user.minutes % 60}m
+            </Text>
           </View>
         ))}
       </View>
@@ -161,6 +161,9 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: '#000',
     marginRight: baseUnit,
+  },
+  highlightedText: {
+    color: accentColor, 
   },
   userContainer: {
     flex: 1,

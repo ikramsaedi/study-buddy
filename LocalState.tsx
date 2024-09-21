@@ -2,10 +2,10 @@
 class LocalState {
   private static instance: LocalState;
 
-  private user: { id: number };
+  private user: { id: number, name: string };
 
   private constructor() {
-    this.user = { id: 1 }; // Default
+    this.user = { id: 1, name: 'Alex'}; // Default
   }
 
   // Ensure that only one instance of the class exists
@@ -21,6 +21,11 @@ class LocalState {
   public getUserDataId() {
     return this.user.id;
   }
+
+  public getUserData() {
+    return this.user;
+  }
+
 
 }
 
