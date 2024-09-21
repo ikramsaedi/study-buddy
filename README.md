@@ -1,8 +1,18 @@
 # Live preview
 
+## Android app
+
 As of 21/09/2024 18:16, you can download the APK for this app on android at the following link: https://expo.dev/accounts/ikramsaedi/projects/study-buddy/builds/846c37c7-3a80-4775-93ff-c545280b8fe6
 
 Note: You may need to change some security settings on your phone to enable this. See: https://www.lifewire.com/install-apk-on-android-4177185 for more troubleshooting details.
+
+## Apple
+
+See [Web](#web)
+
+## Web
+
+Go to https://ikramsaedi.github.io/study-buddy/
 
 # How to run
 
@@ -12,7 +22,11 @@ Note: You may need to change some security settings on your phone to enable this
 
 # How to deploy
 
-### Android Frontend
+### Web Frontend using Github Pages
+
+Run `npm run deploy`.
+
+### Android Frontend using Expo
 
 1. Make an Expo account if you don't have one at: https://expo.dev/signup
 2. In terminal, run `npm install --global eas-cli` to install Expo Application Services. This is what we will use to deploy the app.
@@ -28,6 +42,8 @@ This uses Render to deploy a web service which is the Node server. This only wor
 It currently automatically deploys from the server/ directory. To manually deploy, you will need to login to Render.
 
 # Troubleshooting
+
+### Local development for expo
 
 If you have any issues running the server try:
 
