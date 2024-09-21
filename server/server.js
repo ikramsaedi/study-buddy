@@ -30,22 +30,137 @@ app.get("/api/courses", (req, res) => {
 
 // API route to find a matching user
 app.get("/api/match", (req, res) => {
-  console.log("LOAF!!!");
-  const { degree, course, goalMinutes } = req.query;
-  sql = `SELECT * FROM user
-     WHERE degree = ?
-     AND id IN (SELECT userId FROM user_course WHERE courseId = ?)
-     ORDER BY ABS(goalMinutes - ?) ASC
-     LIMIT 1`;
+  const { userId } = req.query;
 
-  db.all(sql, [degree, course, goalMinutes], (err, rows) => {
-    if (err) {
-      console.log("Database error:", err.message); // Log the error
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json({ match: rows[0] || null });
+  // Step 1: Query the user's degree and goalMinutes based on userId
+  db.get(
+    `SELECT degree, goalMinutes
+     FROM user
+     WHERE id = ?`,
+    [userId],
+    (err, user) => {
+      if (err) {
+        console.log("first");
+        res.status(500).json({ error: err.message });
+        return;
+      }
+
+      if (!user) {
+        res.json({ message: "User not found" });
+        return;
+      }
+
+      const { degree, goalMinutes } = user;
+
+      console.log("userId:", userId);
+      console.log("degree:", degree);
+      console.log("goalMinutes:", goalMinutes);
+
+      // Step 2: Check if the user is already in an auto-match group
+      db.get(
+        `SELECT * FROM user_studyGroup usg
+         JOIN studyGroup sg ON usg.studyGroupId = sg.id
+         WHERE usg.userId = ? AND sg.isAutomatch = 1`,
+        [userId],
+        (err, row) => {
+          if (err) {
+            console.log("second");
+            res.status(500).json({ error: err.message });
+            return;
+          }
+
+          if (row) {
+            res.json({ message: "User is already in an auto-match group" });
+          } else {
+            // Step 3: Find a match based on degree and goalMinutes
+            db.get(
+              `WITH DegreeMatches AS (
+                SELECT *, ABS(goalMinutes - ?) AS goalDiff FROM user
+                WHERE degree = ?
+                AND id NOT IN (
+                    SELECT userId FROM user_studyGroup
+                    WHERE studyGroupId IN (
+                    SELECT id FROM studyGroup 
+                    WHERE isAutomatch = true
+                    AND DATETIME('now') > start
+                    AND DATETIME('now') < end
+                    )
+                )
+                AND id != ?  -- Exclude the requesting user
+                ORDER BY goalDiff ASC
+                )
+                SELECT * FROM DegreeMatches
+                UNION ALL
+                SELECT *, ABS(goalMinutes - ?) AS goalDiff FROM user
+                WHERE id NOT IN (
+                SELECT userId FROM user_studyGroup
+                WHERE studyGroupId IN (
+                    SELECT id FROM studyGroup 
+                    WHERE isAutomatch = true
+                    AND DATETIME('now') > start
+                    AND DATETIME('now') < end
+                )
+                )
+                AND id != ?  -- Exclude the requesting user
+                ORDER BY goalDiff ASC
+                LIMIT 1;`,
+              [goalMinutes, degree, userId, goalMinutes, userId],
+              (err, matchedUser) => {
+                if (err) {
+                  console.log("third");
+                  res.status(500).json({ error: err.message });
+                  return;
+                }
+
+                if (matchedUser) {
+                  const now = new Date().toISOString(); // Get the current date and time in ISO format
+                  const oneWeekFromNow = new Date();
+                  oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7); // Add one week
+                  const end = oneWeekFromNow.toISOString(); // Get the date one week from now in ISO format
+
+                  db.run(
+                    `INSERT INTO studyGroup (name, isAutomatch, start, end) VALUES ('Study Buddy Group', ?, ?, ?)`,
+                    [1, now, end],
+                    function (err) {
+                      if (err) {
+                        console.log("forth", err.message);
+                        res.status(500).json({ error: err.message });
+                        return;
+                      }
+
+                      console.log("wtf is this?", this.lastID); // Get the new group's ID
+                      const newGroupId = this.lastID; // Get the new group's ID
+
+                      // Step 5: Add users to user_group table
+                      db.run(
+                        `INSERT INTO user_studyGroup (userId, studyGroupId) VALUES (?, ?), (?, ?)`,
+                        [userId, newGroupId, matchedUser.id, newGroupId],
+                        (err) => {
+                          if (err) {
+                            console.log("fifth", err.message);
+                            res.status(500).json({ error: err.message });
+                            return;
+                          }
+
+                          res.json({
+                            message: "New group created and users added",
+                            groupId: newGroupId,
+                            matchedUser,
+                          });
+                        }
+                      );
+                    }
+                  );
+                } else {
+                  res.json({ message: "No match found" });
+                }
+              }
+            );
+          }
+        }
+      );
     }
-  });
+  );
 });
 
 // Start server
