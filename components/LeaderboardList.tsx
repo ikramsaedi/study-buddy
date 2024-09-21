@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { MoreMenu } from './MoreMenu';
-import { accentColor, baseIconSize, baseUnit, bodyFontSize, doubleBaseUnit } from '../styles/styles';
+import { accentColor, backgroundColor, baseIconSize, baseUnit, bodyFontSize, doubleBaseUnit } from '../styles/styles';
 
 type Member = {
   name: string;
@@ -20,15 +20,6 @@ export function LeaderboardList() {
       { name: 'Lavinia', hours: 27 },
       { name: 'Cham', hours: 18 },
       { name: 'Saanvi', hours: 10 }
-    ],
-    'Hackathon': [
-      { name: 'Ikram', hours: 32 },
-      { name: 'Cham', hours: 18 }
-    ],
-    'StudyGroup': [
-      { name: 'Emma', hours: 28 },
-      { name: 'Chris', hours: 21 },
-      { name: 'Cham', hours: 18 }
     ]
   };
 
@@ -54,8 +45,12 @@ export function LeaderboardList() {
   return (
     <>
       <View style={styles.tabsWrapper}>
-        {/* Group tabs in a scrollable view */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsContainer}>
+        {/* Group tabs in a scrollable and centered view */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsContainer}
+        >
           {Object.keys(groupMembersData).map(group => (
             <TouchableOpacity key={group} onPress={() => handleGroupSelect(group)} style={selectedTab === group ? [styles.tab, styles.selectedTab] : styles.tab}>
               <Text style={selectedTab === group ? [styles.tabText, styles.selectedTabText] : styles.tabText}>{group}</Text>
@@ -63,7 +58,7 @@ export function LeaderboardList() {
           ))}
         </ScrollView>
 
-        {/* More Icon Button, fixed to stay visible */}
+        {/* More Icon Button, fixed to stay visible on the right */}
         <TouchableOpacity onPress={() => setShowMoreMenu(true)} style={styles.moreButton}>
           <Feather name="more-vertical" size={baseIconSize} color={accentColor} />
         </TouchableOpacity>
@@ -97,11 +92,14 @@ const styles = StyleSheet.create({
   tabsWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     borderBottomWidth: 1,
     borderColor: '#D3D3D3',
+    position: 'relative',
   },
   tabsContainer: {
     flexDirection: 'row',
+    justifyContent: 'center', 
     flexGrow: 1,
   },
   tab: {
@@ -122,8 +120,11 @@ const styles = StyleSheet.create({
     color: accentColor,
   },
   moreButton: {
-    paddingHorizontal: doubleBaseUnit,
+    position: 'absolute',
+    right: 0, 
+    paddingHorizontal: baseUnit / 2,
     justifyContent: 'center',
+    backgroundColor: backgroundColor,
   },
   leaderboardContainer: {
     padding: baseUnit,
