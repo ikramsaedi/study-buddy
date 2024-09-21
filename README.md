@@ -111,6 +111,10 @@ To organise our data, we created ERD diagrams that mapped out the relationships 
 
 We used an Express server that connects to our SQLite database. The server features multiple routes, including GET and POST requests, to interact with the database. The frontend is it's only client.
 
+#### Matching algorithm concerns
+
+Our matching algorithm can be optimised to become scalable using database indexes.
+
 ### Deployment
 
 We deployed both the server and database on [Render](https://dashboard.render.com/) using a paid tier option. The React Native frontend was deployed using Expo Application Services.
@@ -146,5 +150,11 @@ We are proud of several accomplishments from our project. Throughout the process
 While developing, we worked with new technologies, such as React Native, Node, Express, SQLite, and Expo, which allowed us to skill build. We also improved our time management abilities by implementing time-blocking techniques, allowing us to stay organised and focused. Additionally, we learned the importance of teamwork and communication; understanding each other’s strengths and perspectives was vital to our success.
 
 ## What's next for Study Buddy
+
+1. Click on a user in the leaderboard to compete with a friend
+2. Create a custom group
+3. Virtual study room with friend that you're competing against
+4. Adding friends directly
+5. Customise the matching filter to include gender or interests
 
 We'd like to understand about how we can keep on supporting community within this application. This could mean adding chats or reactions to send to fellow peers when they are more productive or need cheering up!
