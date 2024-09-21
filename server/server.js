@@ -195,7 +195,7 @@ app.post("/api/addStudySession", (req, res) => {
   });
 });
 
-// TODO: Probably need to fix this to fetch today's data eventually
+// Fetch user stats for today
 app.get("/api/user/:id/stats", (req, res) => {
   const userId = req.params.id;
 
@@ -207,6 +207,7 @@ app.get("/api/user/:id/stats", (req, res) => {
       COUNT(DISTINCT tag) as types
     FROM studySession
     WHERE userId = ?
+    AND DATE(start) = DATE('now') -- Filter for today's date
   `;
 
   db.get(query, [userId], (err, row) => {
@@ -222,6 +223,7 @@ app.get("/api/user/:id/stats", (req, res) => {
     });
   });
 });
+
 
 // API endpoint to get all study groups for a user
 app.get("/api/user/:id/studyGroups", (req, res) => {
@@ -250,7 +252,7 @@ app.get("/api/user/:id/studyGroups", (req, res) => {
   });
 });
 
-// API endpoint to get all members and their total minutes for a study group
+// API endpoint to get all members and their total minutes for a study group (filtered by group's start and end dates)
 app.get("/api/groups/:id/members", (req, res) => {
   const groupId = req.params.id;
 
@@ -261,10 +263,12 @@ app.get("/api/groups/:id/members", (req, res) => {
     INNER JOIN user_studyGroup usg ON u.id = usg.userId
     LEFT JOIN studySession ss ON u.id = ss.userId
     WHERE usg.studyGroupId = ?
+      AND (ss.start IS NULL OR (ss.start >= (SELECT start FROM studyGroup WHERE id = ?)
+      AND (SELECT end FROM studyGroup WHERE id = ?) IS NULL OR ss.start <= (SELECT end FROM studyGroup WHERE id = ?)))
     GROUP BY u.id
   `;
 
-  db.all(query, [groupId], (err, rows) => {
+  db.all(query, [groupId, groupId, groupId, groupId], (err, rows) => {
     if (err) {
       console.error('Database error:', err.message); // Log the exact error for debugging
       res.status(500).json({ error: err.message });
@@ -285,6 +289,7 @@ app.get("/api/groups/:id/members", (req, res) => {
     res.json({ members });
   });
 });
+
 
 // Start server
 app.listen(PORT, () => {
