@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import axios from "axios";
 import { ROOT_URL } from "../config";
+import LocalState from "../LocalState";
 
 type StopwatchButtonsProps = {
   running: boolean;
@@ -23,11 +24,13 @@ const addStudySession = async (
   startTime: Date,
   endTime: Date
 ) => {
+  const localState = LocalState.getInstance();
+  
   try {
     // LOAF
     // this is problem
     await axios.post(`${ROOT_URL}/api/addStudySession`, {
-      userId: 1, // For user with ID 1
+      userId: localState.getUserDataId(),
       durationMinutes: durationMinutes,
       start: startTime.toISOString(), // Send as ISO string
       end: endTime.toISOString(), // Send as ISO string

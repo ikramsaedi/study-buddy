@@ -3,8 +3,10 @@ import { View, Text, StyleSheet } from 'react-native';
 import { bodyFontSize, doubleBaseUnit, baseUnit, LargeNumberText, smallerTitleFontSize, smallFontSize } from '../styles/styles';
 import axios from 'axios';
 import { ROOT_URL } from '../config';
+import LocalState from '../LocalState';
 
 export function StatCard() {
+  const localState = LocalState.getInstance();
   const [userStats, setUserStats] = useState({
     totalMinutes: 0,
     longestSession: 0,
@@ -16,7 +18,7 @@ export function StatCard() {
 
   // Fetch user statistics from the API
   useEffect(() => {
-    const userId = 1; // Replace this with the actual logged-in user ID
+    const userId = localState.getUserDataId(); // Replace this with the actual logged-in user ID
 
     // We have to replace this url with your IP Address
     axios.get(`${ROOT_URL}/api/user/${userId}/stats`)

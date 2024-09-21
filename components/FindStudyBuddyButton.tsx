@@ -3,12 +3,14 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
 import { doubleBaseUnit, bodyFontSize, accentColor } from "../styles/styles";
 import { ROOT_URL } from "../config";
+import LocalState from "../LocalState";
 
 type FindBuddyButtonProps = {
   onMatchFound: (matchedUser: string) => void;
 };
 
 export function FindBuddyButton({ onMatchFound }: FindBuddyButtonProps) {
+  const localState = LocalState.getInstance();
   const [isInAutoMatchGroup, setIsInAutoMatchGroup] = useState(false);
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export function FindBuddyButton({ onMatchFound }: FindBuddyButtonProps) {
     try {
       const response = await axios.get(`${ROOT_URL}/api/match`, {
         params: {
-          userId: 1, // Replace with the actual user ID dynamically if needed
+          userId: localState.getUserDataId()
         },
       });
 

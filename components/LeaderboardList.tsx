@@ -3,11 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import Feather from 'react-native-vector-icons/Feather';
 import { MoreMenu } from './MoreMenu';
 import { accentColor, backgroundColor, baseIconSize, baseUnit, bodyFontSize, doubleBaseUnit } from '../styles/styles';
-import LocalState from '../LocalState';
 import { fetchGroupMembers, fetchStudyGroups } from '../helpers/leaderboardService';
 
 export function LeaderboardList() {
-  const localState = LocalState.getInstance();
   const [selectedTab, setSelectedTab] = useState('');
   const [members, setMembers] = useState<{ name: string; minutes: number }[]>([]);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -20,13 +18,15 @@ export function LeaderboardList() {
   const fetchAndSetMembers = async (groupName: string) => {
     const groupId = parseInt(Object.keys(groups).find(key => groups[parseInt(key)] === groupName) || '', 10);
     if (groupWithData.current[groupName]) {
-      // If the group data is already cached, use it
-      setMembers(groupWithData.current[groupName]);
+      // If the group data is already cached, use it and sort by minutes in descending order
+      const sortedMembers = groupWithData.current[groupName].sort((a, b) => b.minutes - a.minutes);
+      setMembers(sortedMembers);
     } else if (!isNaN(groupId)) {
       // Otherwise, fetch the group members and cache it
       const groupMembers = await fetchGroupMembers(groupId);
       groupWithData.current[groupName] = groupMembers;
-      setMembers(groupMembers);
+      const sortedMembers: { name: string; minutes: number }[] = groupMembers.sort((a: { name: string; minutes: number }, b: { name: string; minutes: number }) => b.minutes - a.minutes);
+      setMembers(sortedMembers);
     }
   };
 
@@ -40,11 +40,12 @@ export function LeaderboardList() {
       const firstGroupName = groupData[Object.keys(groupData)[0]];
       setSelectedTab(firstGroupName);
       
-      // Fetch members for the first group and cache it
+      // Fetch members for the first group and cache it, then sort
       const groupId = parseInt(Object.keys(groupData)[0], 10);
       const groupMembers = await fetchGroupMembers(groupId);
       groupWithData.current[firstGroupName] = groupMembers;
-      setMembers(groupMembers);
+      const sortedMembers = groupMembers.sort((a: { name: string; minutes: number }, b: { name: string; minutes: number }) => b.minutes - a.minutes); 
+      setMembers(sortedMembers);
     };
 
     loadGroups();
