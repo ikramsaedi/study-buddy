@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import axios from "axios";
+import { ROOT_URL } from "../config";
 
 type StopwatchButtonsProps = {
   running: boolean;
@@ -25,7 +26,7 @@ const addStudySession = async (
   try {
     // LOAF
     // this is problem
-    await axios.post("http://192.168.169.2:3000/api/addStudySession", {
+    await axios.post(`${ROOT_URL}/api/addStudySession`, {
       userId: 1, // For user with ID 1
       durationMinutes: durationMinutes,
       start: startTime.toISOString(), // Send as ISO string

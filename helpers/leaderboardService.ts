@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { ROOT_URL } from '../config';
 
 // Fetch members for a specific group
 export const fetchGroupMembers = async (groupId: number) => {
   try {
-    const response = await axios.get(`http://192.168.211.174:3000/api/groups/${groupId}/members`); // API to get group members
+    const response = await axios.get(`${ROOT_URL}/api/groups/${groupId}/members`); // API to get group members
     return response.data.members.map((member: { name: string, minutes: number }) => ({
       name: member.name,
       minutes: member.minutes
@@ -17,7 +18,7 @@ export const fetchGroupMembers = async (groupId: number) => {
 // Fetch study groups from the API
 export const fetchStudyGroups = async () => {
   try {
-    const response = await axios.get(`http://192.168.211.174:3000/api/user/1/studyGroups`); // Change userId as needed
+    const response = await axios.get(`${ROOT_URL}/api/user/1/studyGroups`); // Change userId as needed
     return response.data.studyGroups.reduce((acc: { [key: number]: string }, group: { id: number, name: string }) => {
       acc[group.id] = group.name;
       return acc;
