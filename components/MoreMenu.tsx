@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
 import { bodyFontSize, doubleBaseUnit, accentColor } from '../styles/styles';
 
 type MoreMenuProps = {
@@ -9,21 +9,11 @@ type MoreMenuProps = {
 };
 
 export function MoreMenu({ visible, onClose, onCreateGroup }: MoreMenuProps) {
-  const [groupName, setGroupName] = useState('');
-  const [showInputModal, setShowInputModal] = useState(false);
-
   const handleCreateGroup = () => {
-    setShowInputModal(true);  
+    Alert.alert("Not Implemented", "This feature isn't part of the MVP.");
+    onClose(); // Close the menu after showing the alert
   };
-
-  const handleSubmitGroup = () => {
-    if (groupName) {
-      onCreateGroup(groupName); 
-      setGroupName('');
-      setShowInputModal(false);
-      onClose();  
-    }
-  };
+  
 
   return (
     <>
@@ -31,34 +21,11 @@ export function MoreMenu({ visible, onClose, onCreateGroup }: MoreMenuProps) {
         <View style={styles.modalBackground}>
           <View style={styles.moreMenu}>
             <TouchableOpacity onPress={handleCreateGroup} style={styles.menuItem}>
-              <Text style={styles.menuItemText}>Create Group</Text>
+              <Text style={styles.menuItemText}>Create Custom Group</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onClose} style={styles.menuItem}>
               <Text style={styles.menuItemText}>Cancel</Text>
             </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Input modal for creating a new group */}
-      <Modal visible={showInputModal} transparent={true} animationType="slide">
-        <View style={styles.modalBackground}>
-          <View style={styles.inputModal}>
-            <Text style={styles.inputLabel}>Enter Group Name</Text>
-            <TextInput
-              style={styles.input}
-              value={groupName}
-              onChangeText={setGroupName}
-              placeholder="Group Name"
-            />
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity onPress={handleSubmitGroup} style={styles.submitButton}>
-                <Text style={styles.buttonText}>Create</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setShowInputModal(false)} style={styles.cancelButton}>
-                <Text style={styles.buttonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       </Modal>
