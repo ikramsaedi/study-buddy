@@ -56,7 +56,7 @@ export function LeaderboardList() {
   };
 
   const handleCreateGroup = (groupName: string) => {
-    localState.addGroup(groupName); // Add group to singleton
+    // fix this
     setSelectedTab(groupName);
     setMembers([{ name: 'You', minutes: 0 }]);
   };
