@@ -1,27 +1,64 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { MoreMenu } from './MoreMenu';
 import { accentColor, backgroundColor, baseIconSize, baseUnit, bodyFontSize, doubleBaseUnit } from '../styles/styles';
 import LocalState from '../LocalState';
+import { fetchGroupMembers, fetchStudyGroups } from '../helpers/leaderboardService';
 
 export function LeaderboardList() {
-  const localState = LocalState.getInstance(); // Access the singleton instance
-  const initialGroupMembersData = localState.getGroupMembersData(); // Get data from singleton
-
-  const [selectedTab, setSelectedTab] = useState('Friends');
-  const [members, setMembers] = useState(initialGroupMembersData['Friends']);
+  const localState = LocalState.getInstance();
+  const [selectedTab, setSelectedTab] = useState('');
+  const [members, setMembers] = useState<{ name: string; minutes: number }[]>([]);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [groups, setGroups] = useState<{ [key: number]: string }>({});
+  
+  // UseRef to store group data across renders without causing re-renders
+  const groupWithData = useRef<{ [key: string]: { name: string; minutes: number }[] }>({});
+
+  // Fetch members for the selected group and update state
+  const fetchAndSetMembers = async (groupName: string) => {
+    const groupId = parseInt(Object.keys(groups).find(key => groups[parseInt(key)] === groupName) || '', 10);
+    if (groupWithData.current[groupName]) {
+      // If the group data is already cached, use it
+      setMembers(groupWithData.current[groupName]);
+    } else if (!isNaN(groupId)) {
+      // Otherwise, fetch the group members and cache it
+      const groupMembers = await fetchGroupMembers(groupId);
+      groupWithData.current[groupName] = groupMembers;
+      setMembers(groupMembers);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch study groups and set the default tab
+    const loadGroups = async () => {
+      const groupData = await fetchStudyGroups();
+      setGroups(groupData);
+
+      // Set default tab to the first group (first key in groupData)
+      const firstGroupName = groupData[Object.keys(groupData)[0]];
+      setSelectedTab(firstGroupName);
+      
+      // Fetch members for the first group and cache it
+      const groupId = parseInt(Object.keys(groupData)[0], 10);
+      const groupMembers = await fetchGroupMembers(groupId);
+      groupWithData.current[firstGroupName] = groupMembers;
+      setMembers(groupMembers);
+    };
+
+    loadGroups();
+  }, []);
 
   const handleGroupSelect = (group: string) => {
     setSelectedTab(group);
-    setMembers(initialGroupMembersData[group]);
+    fetchAndSetMembers(group); // Fetch and display members when the tab is switched
   };
 
   const handleCreateGroup = (groupName: string) => {
     localState.addGroup(groupName); // Add group to singleton
     setSelectedTab(groupName);
-    setMembers([{ name: 'You', hours: 0 }]);
+    setMembers([{ name: 'You', minutes: 0 }]);
   };
 
   return (
@@ -29,9 +66,9 @@ export function LeaderboardList() {
       {/* Group tabs */}
       <View style={styles.tabsWrapper}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
-          {Object.keys(initialGroupMembersData).map(group => (
-            <TouchableOpacity key={group} onPress={() => handleGroupSelect(group)} style={selectedTab === group ? [styles.tab, styles.selectedTab] : styles.tab}>
-              <Text style={selectedTab === group ? [styles.tabText, styles.selectedTabText] : styles.tabText}>{group}</Text>
+          {Object.keys(groups).map(groupId => (
+            <TouchableOpacity key={groupId} onPress={() => handleGroupSelect(groups[parseInt(groupId)])} style={selectedTab === groups[parseInt(groupId)] ? [styles.tab, styles.selectedTab] : styles.tab}>
+              <Text style={selectedTab === groups[parseInt(groupId)] ? [styles.tabText, styles.selectedTabText] : styles.tabText}>{groups[parseInt(groupId)]}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -56,7 +93,7 @@ export function LeaderboardList() {
             <View style={styles.userContainer}>
               <Text style={styles.userName}>{user.name}</Text>
             </View>
-            <Text style={styles.hoursText}>{user.hours} hrs</Text>
+            <Text style={styles.hoursText}>{Math.floor(user.minutes / 60)}h {user.minutes % 60}m</Text>
           </View>
         ))}
       </View>
