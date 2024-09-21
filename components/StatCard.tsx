@@ -1,9 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { bodyFontSize, doubleBaseUnit, baseUnit, LargeNumberText, smallerTitleFontSize, smallFontSize } from '../styles/styles';
-import axios from 'axios';
-import { ROOT_URL } from '../config';
-import LocalState from '../LocalState';
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import {
+  bodyFontSize,
+  doubleBaseUnit,
+  baseUnit,
+  LargeNumberText,
+  smallerTitleFontSize,
+  smallFontSize,
+} from "../styles/styles";
+import axios from "axios";
+import { ROOT_URL } from "../config";
+import LocalState from "../LocalState";
 
 export function StatCard() {
   const localState = LocalState.getInstance();
@@ -14,20 +21,36 @@ export function StatCard() {
     types: 0,
   });
 
-  const formattedDate = new Date().toLocaleDateString("en-AU", { day: 'numeric', month: 'long' });
+  const formattedDate = new Date().toLocaleDateString("en-AU", {
+    day: "numeric",
+    month: "long",
+  });
 
-  // Fetch user statistics from the API
+  // Fetch user statistics from the API with polling
   useEffect(() => {
     const userId = localState.getUserDataId(); // Replace this with the actual logged-in user ID
 
-    // We have to replace this url with your IP Address
-    axios.get(`${ROOT_URL}/api/user/${userId}/stats`)
-      .then(response => {
-        setUserStats(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching user stats:', error);
-      });
+    // Function to fetch stats
+    const fetchStats = () => {
+      console.log("loaf fetching stats...");
+      axios
+        .get(`${ROOT_URL}/api/user/${userId}/stats`)
+        .then((response) => {
+          setUserStats(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user stats:", error);
+        });
+    };
+
+    // Initial fetch when component mounts
+    fetchStats();
+
+    // Set an interval to fetch stats every 5 seconds (60000 milliseconds)
+    const intervalId = setInterval(fetchStats, 5000);
+
+    // Cleanup the interval when component unmounts
+    return () => clearInterval(intervalId);
   }, []);
 
   const hoursStudied = {
@@ -46,7 +69,9 @@ export function StatCard() {
       {/* Hours Study Stat card */}
       <View style={styles.statsCard}>
         <Text style={styles.hoursText}>Hours Studied</Text>
-        <Text style={styles.hoursStudied}>{hoursStudied.hours}h {hoursStudied.minutes}m</Text>
+        <Text style={styles.hoursStudied}>
+          {hoursStudied.hours}h {hoursStudied.minutes}m
+        </Text>
 
         {/* Extra stats row */}
         <View style={styles.statsRow}>
@@ -55,7 +80,9 @@ export function StatCard() {
             <Text style={styles.statLabel}>Sessions</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{longestSession.hours}h {longestSession.minutes}m</Text>
+            <Text style={styles.statNumber}>
+              {longestSession.hours}h {longestSession.minutes}m
+            </Text>
             <Text style={styles.statLabel}>Longest</Text>
           </View>
           <View style={styles.statItem}>
@@ -74,15 +101,15 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: bodyFontSize,
-    color: '#666',
+    color: "#666",
     marginBottom: baseUnit,
   },
   statsCard: {
-    backgroundColor: '#f0f0f5',
+    backgroundColor: "#f0f0f5",
     borderRadius: 12,
     padding: doubleBaseUnit,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
@@ -90,29 +117,29 @@ const styles = StyleSheet.create({
   },
   hoursText: {
     fontSize: bodyFontSize,
-    color: '#666',
+    color: "#666",
   },
   hoursStudied: {
     fontSize: LargeNumberText,
-    fontWeight: 'bold',
-    color: '#50BC9C',
+    fontWeight: "bold",
+    color: "#50BC9C",
     marginVertical: baseUnit,
   },
   statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     marginTop: baseUnit,
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statNumber: {
     fontSize: smallerTitleFontSize,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   statLabel: {
     fontSize: smallFontSize,
-    color: '#666',
+    color: "#666",
   },
 });
