@@ -1,9 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as SQLite from "expo-sqlite";
 import { View, TouchableOpacity, Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { Leaderboard } from "./pages/Leaderboard";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Profile } from "./pages/Profile";
+import { Tracker } from "./pages/Tracker";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
 import {
   accentColor,
   backgroundColor,
@@ -11,36 +16,30 @@ import {
   baseIconSize,
   doubleBaseUnit,
 } from "./styles/styles";
-import { Profile } from "./pages/Profile";
-import { Tracker } from "./pages/Tracker";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
+
   useEffect(() => {
     const openDB = async () => {
-      const db = SQLite.openDatabaseSync("studybuddy.db");
-      // You can add more logic to use the db here if necessary
+      const db = await SQLite.openDatabaseAsync("studybuddy");
+
+      setDb(await db);
     };
     openDB();
   }, []);
+
   return (
     <NavigationContainer>
       <Tab.Navigator
-        // Specifies default tab
         initialRouteName="Leaderboard"
-        // This sets the bg color for all pages
         sceneContainerStyle={{ backgroundColor: backgroundColor }}
         screenOptions={{
-          // TAB STYLING
           tabBarStyle: { backgroundColor: navbarBackgroundColor },
           tabBarActiveTintColor: accentColor,
-          // HEADER STYLING
-          headerStyle: {
-            backgroundColor: navbarBackgroundColor,
-          },
+          headerStyle: { backgroundColor: navbarBackgroundColor },
           headerTintColor: accentColor,
           headerTitle: "StudyBuddy",
           headerTitleAlign: "left",
