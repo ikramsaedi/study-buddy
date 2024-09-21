@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
-import { ScrollView, View, TouchableOpacity, Text, StyleSheet, Modal } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons'; // or other icon library you're using
-import { bodyFontSize, doubleBaseUnit, accentColor, baseIconSize } from '../styles/styles';
+import React from 'react';
+import { ScrollView, View } from 'react-native';
+import { doubleBaseUnit} from '../styles/styles';
 import { LeaderboardList } from '../components/LeaderboardList';
 import { StatCard } from '../components/StatCard';
-import Feather from "react-native-vector-icons/Feather";
 
 export function Leaderboard() {
   const today = new Date();
