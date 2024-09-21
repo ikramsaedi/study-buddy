@@ -5,7 +5,7 @@ import { bodyFontSize, doubleBaseUnit, accentColor } from '../styles/styles';
 type MoreMenuProps = {
   visible: boolean;
   onClose: () => void;
-  onCreateGroup: (groupName: string) => void;
+  onCreateGroup: (groupName: string) => void;  // Update to accept group name
 };
 
 export function MoreMenu({ visible, onClose, onCreateGroup }: MoreMenuProps) {
@@ -13,17 +13,15 @@ export function MoreMenu({ visible, onClose, onCreateGroup }: MoreMenuProps) {
   const [showInputModal, setShowInputModal] = useState(false);
 
   const handleCreateGroup = () => {
-    onClose(); // Close the first modal
-    setTimeout(() => {
-      setShowInputModal(true); // Show the input modal
-    }, 300); // Adding a slight delay to ensure smooth transitions
+    setShowInputModal(true);  
   };
 
   const handleSubmitGroup = () => {
     if (groupName) {
-      onCreateGroup(groupName);
+      onCreateGroup(groupName); 
       setGroupName('');
       setShowInputModal(false);
+      onClose();  
     }
   };
 
@@ -42,6 +40,7 @@ export function MoreMenu({ visible, onClose, onCreateGroup }: MoreMenuProps) {
         </View>
       </Modal>
 
+      {/* Input modal for creating a new group */}
       <Modal visible={showInputModal} transparent={true} animationType="slide">
         <View style={styles.modalBackground}>
           <View style={styles.inputModal}>

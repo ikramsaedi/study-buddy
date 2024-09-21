@@ -3,68 +3,44 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import Feather from 'react-native-vector-icons/Feather';
 import { MoreMenu } from './MoreMenu';
 import { accentColor, backgroundColor, baseIconSize, baseUnit, bodyFontSize, doubleBaseUnit } from '../styles/styles';
-
-type Member = {
-  name: string;
-  hours: number;
-};
-
-type GroupMembersData = {
-  [k: string]: Member[];
-};
+import LocalState from '../LocalState';
 
 export function LeaderboardList() {
-  const initialGroupMembersData: GroupMembersData = {
-    'Friends': [
-      { name: 'Ikram', hours: 32 },
-      { name: 'Lavinia', hours: 27 },
-      { name: 'Cham', hours: 18 },
-      { name: 'Saanvi', hours: 10 }
-    ]
-  };
+  const localState = LocalState.getInstance(); // Access the singleton instance
+  const initialGroupMembersData = localState.getGroupMembersData(); // Get data from singleton
 
-  const [groupMembersData, setGroupMembersData] = useState(initialGroupMembersData);
   const [selectedTab, setSelectedTab] = useState('Friends');
-  const [members, setMembers] = useState(groupMembersData['Friends']);
+  const [members, setMembers] = useState(initialGroupMembersData['Friends']);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
   const handleGroupSelect = (group: string) => {
     setSelectedTab(group);
-    setMembers(groupMembersData[group]);
+    setMembers(initialGroupMembersData[group]);
   };
 
   const handleCreateGroup = (groupName: string) => {
-    setGroupMembersData((prevState) => ({
-      ...prevState,
-      [groupName]: [{ name: 'You', hours: 0 }]
-    }));
+    localState.addGroup(groupName); // Add group to singleton
     setSelectedTab(groupName);
     setMembers([{ name: 'You', hours: 0 }]);
   };
 
   return (
     <>
+      {/* Group tabs */}
       <View style={styles.tabsWrapper}>
-        {/* Group tabs in a scrollable and centered view */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsContainer}
-        >
-          {Object.keys(groupMembersData).map(group => (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContainer}>
+          {Object.keys(initialGroupMembersData).map(group => (
             <TouchableOpacity key={group} onPress={() => handleGroupSelect(group)} style={selectedTab === group ? [styles.tab, styles.selectedTab] : styles.tab}>
               <Text style={selectedTab === group ? [styles.tabText, styles.selectedTabText] : styles.tabText}>{group}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
-
-        {/* More Icon Button, fixed to stay visible on the right */}
         <TouchableOpacity onPress={() => setShowMoreMenu(true)} style={styles.moreButton}>
           <Feather name="more-vertical" size={baseIconSize} color={accentColor} />
         </TouchableOpacity>
       </View>
 
-      {/* More Menu Component */}
+      {/* More Menu */}
       <MoreMenu
         visible={showMoreMenu}
         onClose={() => setShowMoreMenu(false)}
@@ -138,7 +114,7 @@ const styles = StyleSheet.create({
   rankText: {
     fontSize: bodyFontSize,
     fontWeight: 'bold',
-    color: '#999',
+    color: '#000',
     marginRight: baseUnit,
   },
   profilePicPlaceholder: {
