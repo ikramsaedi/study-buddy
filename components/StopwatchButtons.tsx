@@ -25,10 +25,8 @@ const addStudySession = async (
   endTime: Date
 ) => {
   const localState = LocalState.getInstance();
-  
+
   try {
-    // LOAF
-    // this is problem
     await axios.post(`${ROOT_URL}/api/addStudySession`, {
       userId: localState.getUserDataId(),
       durationMinutes: durationMinutes,
