@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Platform,
+} from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import axios from "axios";
 import { ROOT_URL } from "../config";
@@ -63,8 +69,33 @@ export function StopwatchButtons({
     pauseStopwatch();
     const durationMinutes = calculateDurationMinutes(time); // Calculate duration in minutes
 
+    // Need this for the browser for apple devices
+    const alertPolyfill = (
+      title: string,
+      description: string,
+      options: any
+    ) => {
+      const result = window.confirm(
+        [title, description].filter(Boolean).join("\n\n")
+      );
+
+      if (result) {
+        const confirmOption = options.find(
+          (option: any) => option.style !== "cancel"
+        );
+        confirmOption && confirmOption.onPress();
+      } else {
+        const cancelOption = options.find(
+          (option: any) => option.style === "cancel"
+        );
+        cancelOption && cancelOption.onPress();
+      }
+    };
+
     // Fire the alert asking whether to add the study session
-    Alert.alert(
+    const alert = Platform.OS === "web" ? alertPolyfill : Alert.alert;
+
+    alert(
       "Add Hours", // title
       "Would you like to add the tracked hours to your total study time?", // message
       [
