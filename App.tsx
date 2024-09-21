@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import * as SQLite from "expo-sqlite";
 import { View, TouchableOpacity, Text } from "react-native";
@@ -10,7 +9,7 @@ import {
   backgroundColor,
   navbarBackgroundColor,
   baseIconSize,
-  doubleBaseUnit
+  doubleBaseUnit,
 } from "./styles/styles";
 import { Profile } from "./pages/Profile";
 import { Tracker } from "./pages/Tracker";
@@ -44,14 +43,28 @@ export default function App() {
           },
           headerTintColor: accentColor,
           headerTitle: "StudyBuddy",
-          headerTitleAlign: 'left',
+          headerTitleAlign: "left",
           headerRight: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <TouchableOpacity onPress={() => alert('Notifications will go here')} style={{ marginRight: doubleBaseUnit }}>
-                <MaterialIcons name="notifications-none" size={baseIconSize} color={accentColor} />
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <TouchableOpacity
+                onPress={() => alert("Notifications will go here")}
+                style={{ marginRight: doubleBaseUnit }}
+              >
+                <MaterialIcons
+                  name="notifications-none"
+                  size={baseIconSize}
+                  color={accentColor}
+                />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => alert('Add a new person')} style={{ marginRight: doubleBaseUnit }}>
-                <MaterialIcons name="person-add-alt" size={baseIconSize} color={accentColor} />
+              <TouchableOpacity
+                onPress={() => alert("Add a new person")}
+                style={{ marginRight: doubleBaseUnit }}
+              >
+                <MaterialIcons
+                  name="person-add-alt"
+                  size={baseIconSize}
+                  color={accentColor}
+                />
               </TouchableOpacity>
             </View>
           ),
